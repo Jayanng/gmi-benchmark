@@ -1,0 +1,482 @@
+{
+  "date": "2026-11-09",
+  "models": [
+    "tencent/hy4"
+  ],
+  "findings_count": 50,
+  "per_model": {
+    "tencent/hy4": {
+      "tp": 15,
+      "fp": 0,
+      "tn": 19,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "accuracy": 0.68,
+      "avg_latency_s": 11.98,
+      "total_cost_usd": 0.1577,
+      "cost_per_finding_usd": 0.003154,
+      "prompt_price_per_token": 8.34e-07,
+      "completion_price_per_token": 2.501e-06,
+      "unparsed": 16,
+      "parsed": 34,
+      "total_findings": 50
+    }
+  },
+  "per_finding": [
+    {
+      "id": "S01",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 5.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S02",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S03",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 16.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S04",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 24.2,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S05",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 4.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S06",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 8.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S07",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 4.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S08",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 23.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S09",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 22.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S10",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 21.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S11",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 22.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S12",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 13.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S13",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 23.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S14",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 3.2,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S15",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 16.2,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S16",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 15.2,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S17",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 22.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S18",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 23.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S19",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 5.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S20",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 11.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S21",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 14.2,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S22",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 23.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S23",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 4.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S24",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 9.8,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "S25",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 21.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F01",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 3.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F02",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 2.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F03",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F04",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 7.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F05",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 3.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F06",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 22.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F07",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 22.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F08",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 5.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F09",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 3.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F10",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 3.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F11",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 3.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F12",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 22.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F13",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 5.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F14",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F15",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 5.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F16",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 8.8,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F17",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 23.8,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F18",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F19",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 3.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F20",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F21",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F22",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.8,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F23",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 23.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F24",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 25.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    },
+    {
+      "id": "F25",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 4.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4"
+    }
+  ],
+  "notes": [
+    "Reconstructed from log-batch1-a.txt after Batch 1-A was stopped 2026-11-09. Verdicts, latencies and per-model metrics are verbatim from the log; recomputed P/R/F1/Acc match the log summary lines exactly. Per-finding raw text and token usage were not in the log, so raw='' and usage={} for these 50 rows. nvidia/nemotron-3-ultra-550b-a55b was partway, 5 findings, all unparsed, no score, not included."
+  ]
+}

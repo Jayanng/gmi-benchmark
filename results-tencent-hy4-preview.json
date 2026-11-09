@@ -1,0 +1,482 @@
+{
+  "date": "2026-11-09",
+  "models": [
+    "tencent/hy4-preview"
+  ],
+  "findings_count": 50,
+  "per_model": {
+    "tencent/hy4-preview": {
+      "tp": 24,
+      "fp": 1,
+      "tn": 18,
+      "fn": 0,
+      "precision": 0.96,
+      "recall": 1.0,
+      "f1": 0.98,
+      "accuracy": 0.84,
+      "avg_latency_s": 24.64,
+      "total_cost_usd": 0.100594,
+      "cost_per_finding_usd": 0.002012,
+      "prompt_price_per_token": 8.34e-07,
+      "completion_price_per_token": 2.501e-06,
+      "unparsed": 7,
+      "parsed": 43,
+      "total_findings": 50
+    }
+  },
+  "per_finding": [
+    {
+      "id": "S01",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 9.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S02",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 29.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S03",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S04",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 12.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S05",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 9.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S06",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 9.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S07",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 12.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S08",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 62.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S09",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 11.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S10",
+      "expected": "real",
+      "verdict": null,
+      "latency_s": 68.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S11",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 11.8,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S12",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 13.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S13",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 37.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S14",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 6.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S15",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 29.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S16",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 39.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S17",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 65.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S18",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 8.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S19",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 7.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S20",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S21",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 18.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S22",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 17.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S23",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S24",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 19.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "S25",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 14.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F01",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 7.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F02",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 8.1,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F03",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 11.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F04",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 7.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F05",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 8.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F06",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 78.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F07",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 80.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F08",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 10.8,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F09",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 6.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F10",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 16.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F11",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 7.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F12",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 71.0,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F13",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 19.2,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F14",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 9.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F15",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 8.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F16",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 12.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F17",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 87.5,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F18",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 13.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F19",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 10.3,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F20",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 10.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F21",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 8.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F22",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 75.9,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F23",
+      "expected": "false_positive",
+      "verdict": null,
+      "latency_s": 81.4,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F24",
+      "expected": "false_positive",
+      "verdict": "real",
+      "latency_s": 20.6,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    },
+    {
+      "id": "F25",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 17.7,
+      "raw": "",
+      "usage": {},
+      "model": "tencent/hy4-preview"
+    }
+  ],
+  "notes": [
+    "Reconstructed from log-batch1-a.txt after Batch 1-A was stopped 2026-11-09. Verdicts, latencies and per-model metrics are verbatim from the log; recomputed P/R/F1/Acc match the log summary lines exactly. Per-finding raw text and token usage were not in the log, so raw='' and usage={} for these 50 rows. nvidia/nemotron-3-ultra-550b-a55b was partway, 5 findings, all unparsed, no score, not included."
+  ]
+}

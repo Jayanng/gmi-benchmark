@@ -1,0 +1,482 @@
+{
+  "date": "2026-11-09",
+  "models": [
+    "Qwen/Qwen3.5-27B"
+  ],
+  "findings_count": 50,
+  "per_model": {
+    "Qwen/Qwen3.5-27B": {
+      "tp": 25,
+      "fp": 3,
+      "tn": 22,
+      "fn": 0,
+      "precision": 0.893,
+      "recall": 1.0,
+      "f1": 0.943,
+      "accuracy": 0.94,
+      "avg_latency_s": 22.2,
+      "total_cost_usd": 0.201537,
+      "cost_per_finding_usd": 0.004031,
+      "prompt_price_per_token": 3e-07,
+      "completion_price_per_token": 2.4e-06,
+      "unparsed": 0,
+      "parsed": 50,
+      "total_findings": 50
+    }
+  },
+  "per_finding": [
+    {
+      "id": "S01",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 17.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S02",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 18.4,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S03",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 9.9,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S04",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 14.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S05",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 26.5,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S06",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 28.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S07",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 16.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S08",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 8.9,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S09",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 12.3,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S10",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 31.4,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S11",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 40.8,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S12",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 9.5,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S13",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 17.6,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S14",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S15",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 11.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S16",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S17",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 17.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S18",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 8.9,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S19",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 10.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S20",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 18.2,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S21",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 14.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S22",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 28.8,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S23",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 12.3,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S24",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 16.5,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "S25",
+      "expected": "real",
+      "verdict": "real",
+      "latency_s": 44.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F01",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 12.0,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F02",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 14.5,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F03",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 14.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F04",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 18.5,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F05",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 11.3,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F06",
+      "expected": "false_positive",
+      "verdict": "real",
+      "latency_s": 66.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F07",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 25.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F08",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 19.5,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F09",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 29.8,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F10",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 26.2,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F11",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 17.4,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F12",
+      "expected": "false_positive",
+      "verdict": "real",
+      "latency_s": 37.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F13",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 22.2,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F14",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 23.9,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F15",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 17.9,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F16",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 26.7,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F17",
+      "expected": "false_positive",
+      "verdict": "real",
+      "latency_s": 72.8,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F18",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 35.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F19",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 17.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F20",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 18.3,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F21",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 18.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F22",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 26.8,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F23",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 29.3,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F24",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 32.9,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    },
+    {
+      "id": "F25",
+      "expected": "false_positive",
+      "verdict": "false_positive",
+      "latency_s": 22.1,
+      "raw": "",
+      "usage": {},
+      "model": "Qwen/Qwen3.5-27B"
+    }
+  ],
+  "notes": [
+    "Reconstructed from log-batch1-a.txt after Batch 1-A was stopped 2026-11-09. Verdicts, latencies and per-model metrics are verbatim from the log; recomputed P/R/F1/Acc match the log summary lines exactly. Per-finding raw text and token usage were not in the log, so raw='' and usage={} for these 50 rows. nvidia/nemotron-3-ultra-550b-a55b was partway, 5 findings, all unparsed, no score, not included."
+  ]
+}
