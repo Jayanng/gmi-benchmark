@@ -338,7 +338,7 @@ footer a:hover{color:var(--lime)}
 
       <div class="ts-panel" id="two-stage-panel" style="display:none">
         <label class="flabel">Two-stage audit</label>
-        <p class="ts-fixed">Escalate when Stage 1 confidence is below the threshold, or its verdict is unparsed, or Stage 1 errors. If Stage 2 errors (502/503), the Stage 1 verdict is kept and the failure is flagged, it is not silently presented as a two-stage result. Any model can be Stage 2. Same prompt, temperature 0, JSON-only answer, confidence threshold, and max_tokens 800 or 1200 for both stages. Smoke-tested 2026-11-09 on 5 findings: Stage 2 never fired, because Stage 1 confidences were all at or above 0.8. Treat two-stage as a way to spend less, not as a measured gain in verdicts.</p>
+        <p class="ts-fixed">Escalate when Stage 1 confidence is below the threshold, or its verdict is unparsed, or Stage 1 errors. If Stage 2 errors (502/503), the Stage 1 verdict is kept and the failure is flagged, it is not silently presented as a two-stage result. Any model can be Stage 2. Same prompt, temperature 0, JSON-only answer, confidence threshold, and max_tokens 800, 1200 or 2500 for both stages. Smoke-tested 2026-11-09 on 5 findings: Stage 2 never fired, because Stage 1 confidences were all at or above 0.8. Treat two-stage as a way to spend less, not as a measured gain in verdicts.</p>
         <div class="ts-row">
           <div class="ts-field">
             <label class="flabel" for="ts-stage1">Stage 1 model, low-cost first pass</label>
@@ -356,7 +356,7 @@ footer a:hover{color:var(--lime)}
           </div>
           <div class="ts-field">
             <label class="flabel" for="ts-max-tokens">max_tokens, both stages</label>
-            <select id="ts-max-tokens" aria-label="max_tokens for both stages"><option value="800" selected>800</option><option value="1200">1200</option></select>
+            <select id="ts-max-tokens" aria-label="max_tokens for both stages"><option value="800" selected>800</option><option value="1200">1200</option><option value="2500">2500</option></select>
           </div>
         </div>
         <div class="pricebox" id="ts-estimate"></div>
@@ -396,7 +396,7 @@ footer a:hover{color:var(--lime)}
     <div class="sec-head">
       <p class="eyebrow"><span class="dot">&#9679;</span> Repo audit</p>
       <h2>Audit a whole repo, file by file</h2>
-      <p>Paste files, fetch a public GitHub repo, or upload a zip. Pick the checks you care about, pick a model, and each file is audited on its own. A finding is only reported if the model finds it in the code shown: nothing is invented, and a file with no findings says so plainly.</p>
+      <p>Paste files, fetch a public GitHub repo, or upload a zip. Pick the checks you care about, pick a model, and each file is audited on its own. A finding is only reported if the model finds it in the code shown: nothing is invented, and a file with no findings says so plainly. Repo audit uses max_tokens 2500 by default, and retries once with a shorter prompt if a model returns no JSON. If a file still comes back unparsed, it is shown as no verdict, not as clean: reasoning models can spend all their completion tokens reasoning and return nothing.</p>
     </div>
 
     <div class="wcard" style="margin-bottom:18px">
@@ -583,6 +583,11 @@ var EXAMPLES = {
  sqlifp:"Semgrep flagged: possible SQL injection, string formatting in query.\nCode in reports/queries.py:\n\ndef orders_for_user(db, user_id):\n    # user_id comes from the session, and the value is bound as a parameter\n    return db.execute(\n        \"SELECT * FROM orders WHERE user_id = ?\",\n        (user_id,),\n    ).fetchall()\n\nThe query uses a placeholder and the value is bound as a parameter by the database driver, so user input cannot break out of the query and inject SQL. Fix: none needed, this is a false positive."
 };
 var TRIAGE_PROMPT = 'You are a security code reviewer. Classify this finding. A finding is real only if untrusted input actually reaches a dangerous sink with no effective mitigation in the code shown. If the code uses parameterisation, escaping, allowlists, or other effective mitigation, it is a false_positive. Return ONLY JSON, no other text: {"verdict": "real" or "false_positive", "severity": "critical|high|medium|low", "confidence": 0-1, "reason": "one short sentence", "fix": "one short sentence"}\n\nFinding:\n';
+var REPO_MAX_TOKENS = 2500;
+var REASONING_MODEL_RE = /deepseek|thinking|\br1\b|reasoning/i;
+function isReasoningModel(id){ return REASONING_MODEL_RE.test(String(id||"")); }
+function reasoningTokensOf(usage){ try{ return (usage&&usage.completion_tokens_details&&usage.completion_tokens_details.reasoning_tokens)||0; }catch(e){ return 0; } }
+var REPO_PROMPT_SHORT = 'You are a security code reviewer. Return ONLY JSON, no other text, no reasoning, no explanation: {"findings": [{"line": number, "check": "one of the selected checks", "verdict": "real" or "false_positive", "severity": "critical|high|medium|low", "confidence": 0-1, "reason": "one short sentence", "fix": "one short sentence"}]}. If nothing matches, return {"findings": []}. Do not invent findings, do not report line numbers you cannot point to in the code shown.\n\nSelected checks:\n';
 var REPO_PROMPT = 'You are a security code reviewer auditing one file. Report ONLY findings that match the selected checks and that are actually present in the code shown. A finding is real only if untrusted input actually reaches a dangerous sink with no effective mitigation in the code shown. If the code uses parameterisation, escaping, allowlists, or another effective mitigation, it is a false_positive, and you may include it as a false_positive only if it is a close call worth flagging, otherwise leave it out. Return ONLY JSON, no other text: {"findings": [{"line": number, "check": "one of the selected checks", "verdict": "real" or "false_positive", "severity": "critical|high|medium|low", "confidence": 0-1, "reason": "one short sentence", "fix": "one short sentence"}]}. If nothing matches, return {"findings": []}. Do not invent findings, do not report line numbers you cannot point to in the code shown.\n\nSelected checks:\n';
 function byId(id){ for(var i=0;i<ALL_MODELS.length;i++){ if(ALL_MODELS[i].id===id) return ALL_MODELS[i]; } return null; }
 function fmt(n,d){ return n.toFixed(d); }
@@ -1020,15 +1025,24 @@ function updateRepoEstimate(){
   var runFiles=files.slice(0,MAX_FILES).filter(function(f){ return f.content!=null&&(f.content||"").length<=MAX_FILE_BYTES; });
   var totT=0, totM=0, unknown=false;
   runFiles.forEach(function(f){
-    var t=typicalCost(model,f.content,800), m=maxCost(model,f.content,800);
+    var t=typicalCost(model,f.content,REPO_MAX_TOKENS), m=maxCost(model,f.content,REPO_MAX_TOKENS);
     if(t==null) unknown=true; else { totT+=t; totM+=m; }
   });
+  var largestPrompt=Math.max.apply(null, runFiles.map(function(f){ return estPromptTokens(f.content); }).concat([0]));
+  var reasoningWarn=isReasoningModel(model);
+  if(largestPrompt>3000||reasoningWarn){
+    var wmsg="<br><b>Warning:</b> ";
+    if(largestPrompt>3000) wmsg+="largest file is about "+largestPrompt.toLocaleString()+" prompt tokens. ";
+    if(reasoningWarn) wmsg+="This is a reasoning-heavy model (DeepSeek / thinking / R1). It can spend all of its completion tokens reasoning and return no JSON at all. ";
+    wmsg+="Repo audit now uses max_tokens 2500 by default, which gives the model room to reason and still return JSON. If a file still comes back unparsed, retry it with google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash or XiaomiMiMo/MiMo-V2.6-Flash, which parsed reliably in the 50-finding test, 0 unparsed on Gemini and Qwen.";
+    warn+=wmsg;
+  }
   var warn="";
   if(files.length>MAX_FILES) warn+="<br>Only the first "+MAX_FILES+" files will run.";
   if(notFetched.length) warn+="<br>"+notFetched.length+" file(s) not fetched yet: tick a file to fetch its contents, or press Audit These Files and they are fetched first.";
   if(over.length) warn+="<br>"+over.length+" file(s) over 40 KB will be skipped: "+over.map(function(f){ return esc(f.name); }).join(", ");
   if(total>MAX_TOTAL_BYTES) warn+="<br>Total size is over the 200 KB limit, files after the limit will be skipped.";
-  el.innerHTML="<b>"+files.length+" file(s)</b> ready, <b>"+runFiles.length+"</b> will run with model <b>"+esc(model)+"</b><br>"+(unknown?"Cost unknown: this model has no per-token price.":"Typical total <b>"+money(totT)+"</b> &middot; Max total <b>"+money(totM)+"</b> at max_tokens 800 per file")+"<br><span style='opacity:.75'>Estimate basis: prompt tokens from each file length (about 4 characters per token) plus the prompt, typical completion 250 tokens, maximum completion 800. Real token counts come back from the API.</span>"+warn;
+  el.innerHTML="<b>"+files.length+" file(s)</b> ready, <b>"+runFiles.length+"</b> will run with model <b>"+esc(model)+"</b><br>"+(unknown?"Cost unknown: this model has no per-token price.":"Typical total <b>"+money(totT)+"</b> &middot; Max total <b>"+money(totM)+"</b> at max_tokens "+REPO_MAX_TOKENS+" per file")+"<br><span style='opacity:.75'>Estimate basis: prompt tokens from each file length (about 4 characters per token) plus the prompt, typical completion 250 tokens, maximum completion "+REPO_MAX_TOKENS+". Real token counts come back from the API.</span>"+warn;
 }
 repoModel.addEventListener("change",updateRepoEstimate);
 function getGhToken(){ try{ var t=document.getElementById("gh-token"); if(t&&t.value.trim()) return t.value.trim(); return sessionStorage.getItem("gh_token")||""; }catch(e){ return ""; } }
@@ -1261,12 +1275,30 @@ document.getElementById("repo-run").addEventListener("click",function(){
     status.innerHTML="<span class='spin'></span>Auditing "+esc(f.name)+" ("+(i+1)+" of "+files.length+") with "+esc(model)+"...";
     var prompt=REPO_PROMPT+checks.join(", ")+"\n\n";
     var fileText="File: "+f.name+"\n```\n"+f.content+"\n```";
-    callGMIWithTokens(key,model,fileText,800,prompt).then(function(res){
+    /* First call at max_tokens 2500. Reasoning models can spend all 800 tokens reasoning and return no JSON, which is exactly what happened to run_benchmark.py on deepseek-v4.1-flash-1017 (4246 prompt, 800 completion, 800 reasoning, $0.002234, unparsed). One automatic retry, with a shorter prompt, is charged as a second call. */
+    callGMIWithTokens(key,model,fileText,REPO_MAX_TOKENS,prompt).then(function(res){
       var findings=parseRepoFindings(res.json);
       var cost=costFromUsage(res.json.usage||{},model); totalCost+=cost;
-      if(findings==null){ errorFiles++; fileResults.push({file:f.name,error:"unparsed",usage:res.json.usage||{},cost_usd:Math.round(cost*1000000)/1000000}); }
-      else { totalFindings+=findings.length; if(!findings.length) noFindingFiles++; fileResults.push({file:f.name,findings:findings,usage:res.json.usage||{},cost_usd:Math.round(cost*1000000)/1000000}); }
-      renderRepoFile(f,findings,res,cost);
+      var retried=false, retryCost=0, retryRes=null;
+      function afterFirst(){
+        if(findings==null&&!retried){
+          retried=true;
+          var shortPrompt=REPO_PROMPT_SHORT+checks.join(", ")+"\n\n";
+          return callGMIWithTokens(key,model,fileText,REPO_MAX_TOKENS,shortPrompt).then(function(r2){
+            retryRes=r2; retryCost=costFromUsage(r2.json.usage||{},model); totalCost+=retryCost;
+            findings=parseRepoFindings(r2.json);
+            return {findings:findings,res:retryRes,cost:cost+retryCost,retried:true,retryCost:retryCost};
+          }).catch(function(){ return {findings:null,res:res,cost:cost,retried:true,retryCost:0}; });
+        }
+        return {findings:findings,res:res,cost:cost,retried:false,retryCost:0};
+      }
+      return afterFirst().then(function(out){
+        findings=out.findings; res=out.res; cost=out.cost;
+        var usage=res.json.usage||{};
+        if(findings==null){ errorFiles++; fileResults.push({file:f.name,error:"unparsed",unparsed:true,retried:out.retried,reasoning_tokens:reasoningTokensOf(usage),usage:usage,cost_usd:Math.round(cost*1000000)/1000000}); }
+        else { totalFindings+=findings.length; if(!findings.length) noFindingFiles++; fileResults.push({file:f.name,findings:findings,retried:out.retried,usage:usage,cost_usd:Math.round(cost*1000000)/1000000}); }
+        renderRepoFile(f,findings,res,cost,out.retried);
+      });
     }).catch(function(e){
       errorFiles++;
       fileResults.push({file:f.name,error:e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90):networkErrorText()),cost_usd:0});
@@ -1279,8 +1311,9 @@ document.getElementById("repo-run").addEventListener("click",function(){
   }
   function finish(){
     btn.disabled=!getKey(); stopBtn.style.display="none"; prog.style.display="none";
-    status.textContent=(repoStop?"Stopped early after ":"Finished ")+done+" of "+files.length+" files on "+model+". Findings returned: "+totalFindings+". Files with no findings: "+noFindingFiles+". Files with an error or unparsed answer: "+errorFiles+". Total cost "+money(totalCost)+"."+(skipped.length?" Skipped "+skipped.length+" file(s): over 40 KB or not yet fetched.":"");
-    var run={kind:"repo",mode:"repo",model:model,checks:checks,files:fileResults,total_findings:totalFindings,files_audited:done,total_cost_usd:Math.round(totalCost*1000000)/1000000,stopped_early:repoStop,at:new Date().toISOString()};
+    var unparsedCount=fileResults.filter(function(fr){ return fr.unparsed; }).length;
+    status.textContent=(repoStop?"Stopped early after ":"Finished ")+done+" of "+files.length+" files on "+model+". Findings returned: "+totalFindings+". Files with no findings: "+noFindingFiles+". Files with no verdict (unparsed or error): "+errorFiles+", of which unparsed: "+unparsedCount+". Unparsed does not mean clean. Total cost "+money(totalCost)+"."+(skipped.length?" Skipped "+skipped.length+" file(s): over 40 KB or not yet fetched.":"");
+    var run={kind:"repo",mode:"repo",model:model,checks:checks,files:fileResults,total_findings:totalFindings,files_audited:done,files_no_verdict:errorFiles,files_unparsed:fileResults.filter(function(fr){ return fr.unparsed; }).length,max_tokens:REPO_MAX_TOKENS,total_cost_usd:Math.round(totalCost*1000000)/1000000,stopped_early:repoStop,at:new Date().toISOString()};
     lastVerdict=run;
     saveRun(run);
     document.getElementById("report").scrollIntoView({behavior:"smooth"});
@@ -1288,12 +1321,13 @@ document.getElementById("repo-run").addEventListener("click",function(){
   step(0);
   }
 });
-function renderRepoFile(f,findings,res,cost,errText){
+function renderRepoFile(f,findings,res,cost,errTextOrRetried){
+  var retried=(errTextOrRetried===true); var errText=(typeof errTextOrRetried==="string")?errTextOrRetried:null;
   var host=document.getElementById("repo-results");
   var card=document.createElement("div"); card.className="wcard"; card.style.marginBottom="18px";
   var html="<h3 style='overflow-wrap:anywhere'>"+esc(f.name)+"</h3>";
   if(errText){ html+="<p class='w-note'>No findings for this file: "+esc(errText)+" Nothing was invented.</p>"; }
-  else if(findings==null){ html+="<p class='w-note'>Unparsed answer. The model replied, but not in the JSON format requested, so no findings are shown for this file rather than guessing. Tokens: "+esc(JSON.stringify(res.json.usage||{}))+"</p>"; }
+  else if(findings==null){ var u=res?res.json.usage||{}:{}; var rt=reasoningTokensOf(u); html+="<p class='w-note'><b>Unparsed, no verdict, this file is NOT clean.</b> The model replied, but not in the JSON format requested, so no findings are shown for this file rather than guessing. "+(retried?"It was retried once with a shorter prompt and still returned no JSON. ":"")+(rt?("It spent "+rt+" of "+(u.completion_tokens||0)+" completion tokens reasoning and produced no visible answer, which is what happens when max_tokens is too small for a reasoning model. "):"")+"Try the same file again with google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash or XiaomiMiMo/MiMo-V2.6-Flash, which parsed reliably in the 50-finding test. Tokens: "+esc(JSON.stringify(u))+"</p>"; }
   else if(!findings.length){ html+="<p class='w-note'>No findings returned for this file. That means the model found nothing matching the selected checks in the code shown, not that the file is proven safe.</p>"; }
   else{
     findings.forEach(function(fd){
@@ -1340,12 +1374,14 @@ function buildMarkdown(run){
     lines.push("- Checks: "+(run.checks||[]).join(", "));
     lines.push("- Files audited: "+run.files_audited);
     lines.push("- Findings returned: "+run.total_findings);
+    lines.push("- Files with no verdict (unparsed or error): "+(run.files_no_verdict||0)+", of which unparsed: "+(run.files_unparsed||0)+". Unparsed does not mean clean.");
+    lines.push("- max_tokens per file: "+(run.max_tokens||2500));
     lines.push("- Total cost: $"+run.total_cost_usd+" (from token usage returned by the API, charged to your GMI account)");
     lines.push("");
     (run.files||[]).forEach(function(fr){
       lines.push("### "+fr.file);
       lines.push("");
-      if(fr.error){ lines.push("No findings: "+fr.error); lines.push(""); return; }
+      if(fr.error){ lines.push(fr.unparsed?"Unparsed, no verdict, this file is NOT clean. Retry with a different model, or max_tokens 2500. Reasoning tokens used: "+(fr.reasoning_tokens||0)+".":"No findings: "+fr.error); lines.push(""); return; }
       if(!fr.findings||!fr.findings.length){ lines.push("No findings returned."); lines.push(""); return; }
       fr.findings.forEach(function(fd){
         lines.push("- Line "+(fd.line==null?"n/a":fd.line)+", "+fd.check+": **"+fd.verdict+"**, severity "+fd.severity+", confidence "+fd.confidence);
