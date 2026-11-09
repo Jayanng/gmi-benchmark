@@ -401,7 +401,7 @@ footer a:hover{color:var(--lime)}
 
     <div class="wcard" style="margin-bottom:18px">
       <h3>1 &middot; Bring the code</h3>
-      <p class="w-note">Limits, stated up front: at most 10 files per run, at most 40 KB per file, 200 KB total. Larger files are skipped and listed as skipped. GitHub fetch works for public repos only, unauthenticated, so GitHub allows about 60 requests an hour from your browser. Private repos are not supported here: paste their files instead.</p>
+      <p class="w-note">Limits, stated up front: at most 10 files per run, at most 40 KB per file, 200 KB total. Larger files are skipped and listed as skipped. GitHub fetch works for public repos, and for private repos you can see if you add a token above. Without a token GitHub allows about 60 requests an hour from your IP address, so a fetch can fail with a bare 400 or 403 on a shared network; add a token for 5,000 an hour. File contents are fetched in your browser when you tick a file, before the audit runs.</p>
       <div class="seg" role="group" aria-label="Repo input method" style="margin-bottom:16px">
         <button class="segbtn active" id="repo-m-paste" type="button">Paste files</button>
         <button class="segbtn" id="repo-m-github" type="button">GitHub URL</button>
@@ -415,8 +415,10 @@ footer a:hover{color:var(--lime)}
 
       <div id="repo-pane-github" style="display:none">
         <div class="field"><label for="gh-url">Public GitHub repo URL</label><input type="text" id="gh-url" placeholder="https://github.com/owner/repo" spellcheck="false" autocomplete="off"></div>
+        <div class="field" style="margin-top:12px"><label for="gh-token">GitHub token, optional</label><input type="password" id="gh-token" placeholder="ghp_... (optional, this tab only)" spellcheck="false" autocomplete="off"><p class="w-note" style="margin-top:6px">Optional. Without a token GitHub allows about 60 requests an hour from your IP address, and shared networks hit that limit fast, which is why a fetch can fail with a bare 400 or 403. With a token it is 5,000 an hour. The token is stored in sessionStorage only for this tab, sent only to api.github.com, and never logged. It also lets you fetch private repos you can see. Leave it blank for public repos.</p></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
           <button class="btn btn-dark" id="gh-fetch" type="button">Fetch File List</button>
+          <button class="btn btn-outline-dark" id="gh-token-clear" type="button">Clear token</button>
         </div>
         <p class="w-note" id="gh-status" style="margin-top:12px">Code files only: .py .js .ts .jsx .tsx .go .java .php .rb .rs .c .h .cpp .cs .kt .swift. Folders like node_modules, vendor, dist and .git are skipped.</p>
         <ul class="file-list" id="gh-files"></ul>
@@ -1012,9 +1014,10 @@ function updateRepoEstimate(){
   var model=repoModel.value;
   var el=document.getElementById("repo-estimate");
   if(!files.length){ el.innerHTML="No files yet. Add files above to see the estimate."; return; }
-  var over=files.filter(function(f){ return f.content.length>MAX_FILE_BYTES; });
-  var total=files.reduce(function(s,f){ return s+Math.min(f.content.length,MAX_FILE_BYTES); },0);
-  var runFiles=files.slice(0,MAX_FILES).filter(function(f){ return f.content.length<=MAX_FILE_BYTES; });
+  var over=files.filter(function(f){ return (f.content||"").length>MAX_FILE_BYTES; });
+  var notFetched=files.filter(function(f){ return f.content==null; });
+  var total=files.reduce(function(s,f){ return s+Math.min((f.content||"").length,MAX_FILE_BYTES); },0);
+  var runFiles=files.slice(0,MAX_FILES).filter(function(f){ return f.content!=null&&(f.content||"").length<=MAX_FILE_BYTES; });
   var totT=0, totM=0, unknown=false;
   runFiles.forEach(function(f){
     var t=typicalCost(model,f.content,800), m=maxCost(model,f.content,800);
@@ -1022,38 +1025,162 @@ function updateRepoEstimate(){
   });
   var warn="";
   if(files.length>MAX_FILES) warn+="<br>Only the first "+MAX_FILES+" files will run.";
+  if(notFetched.length) warn+="<br>"+notFetched.length+" file(s) not fetched yet: tick a file to fetch its contents, or press Audit These Files and they are fetched first.";
   if(over.length) warn+="<br>"+over.length+" file(s) over 40 KB will be skipped: "+over.map(function(f){ return esc(f.name); }).join(", ");
   if(total>MAX_TOTAL_BYTES) warn+="<br>Total size is over the 200 KB limit, files after the limit will be skipped.";
   el.innerHTML="<b>"+files.length+" file(s)</b> ready, <b>"+runFiles.length+"</b> will run with model <b>"+esc(model)+"</b><br>"+(unknown?"Cost unknown: this model has no per-token price.":"Typical total <b>"+money(totT)+"</b> &middot; Max total <b>"+money(totM)+"</b> at max_tokens 800 per file")+"<br><span style='opacity:.75'>Estimate basis: prompt tokens from each file length (about 4 characters per token) plus the prompt, typical completion 250 tokens, maximum completion 800. Real token counts come back from the API.</span>"+warn;
 }
 repoModel.addEventListener("change",updateRepoEstimate);
+function getGhToken(){ try{ var t=document.getElementById("gh-token"); if(t&&t.value.trim()) return t.value.trim(); return sessionStorage.getItem("gh_token")||""; }catch(e){ return ""; } }
+function saveGhToken(v){ try{ if(v) sessionStorage.setItem("gh_token",v); else sessionStorage.removeItem("gh_token"); }catch(e){} }
+document.getElementById("gh-token").addEventListener("input",function(){ saveGhToken(this.value.trim()); });
+document.getElementById("gh-token-clear").addEventListener("click",function(){ document.getElementById("gh-token").value=""; saveGhToken(""); toast("GitHub token cleared"); });
+try{ var _gt=sessionStorage.getItem("gh_token"); if(_gt) document.getElementById("gh-token").value=_gt; }catch(e){}
 function parseRepoURL(url){
-  var m=String(url||"").trim().match(/^https?:\/\/github\.com\/([^\/\s]+)\/([^\/\s#?]+)(?:\/tree\/([^\/\s#?]+)(\/.*)?)?/);
-  if(!m) return null;
-  return {owner:m[1], repo:m[2].replace(/\.git$/,""), branch:m[3]||null, path:(m[4]||"").replace(/^\//,"")};
+  var s=String(url||"").trim();
+  if(!s) return null;
+  /* Accept: owner/repo, github.com/owner/repo, www.github.com/owner/repo, http(s)://github.com/owner/repo, with .git, trailing slash, ?query, #fragment, /tree/<branch>/<path>, /blob/<branch>/<path>. Anything after the repo that is not tree/blob is ignored. */
+  var m=s.match(/^(?:https?:\/\/)?(?:www\.)?github\.com\/([^\/\s#?]+)\/([^\/\s#?]+)(?:\/(.*))?(?:[?#].*)?$/);
+  if(!m){
+    var b=s.match(/^([^\/\s#?]+)\/([^\/\s#?]+)$/);
+    if(!b) return null;
+    return {owner:b[1], repo:b[2].replace(/\.git$/,""), ref:null, path:""};
+  }
+  var repo=m[2].replace(/\.git$/,"");
+  var rest=(m[3]||"").replace(/[?#].*$/,"").replace(/\/+$/,"");
+  var ref=null, path="";
+  var tm=rest.match(/^(?:tree|blob)\/(.+)$/);
+  if(tm){ ref=tm[1]; }
+  return {owner:m[1], repo:repo, ref:ref, path:path};
+}
+function ghHeaders(){
+  var h={"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};
+  var t=getGhToken(); if(t) h["Authorization"]="Bearer "+t;
+  return h;
+}
+function gh(path){
+  return fetch("https://api.github.com"+path,{headers:ghHeaders()}).then(function(r){
+    var reset=r.headers.get("X-RateLimit-Reset"), remain=r.headers.get("X-RateLimit-Remaining");
+    if(r.ok) return r.json();
+    return r.text().then(function(txt){
+      var msg=""; try{ msg=(JSON.parse(txt)||{}).message||""; }catch(e){}
+      var err={status:r.status,message:msg,reset:reset,remain:remain};
+      throw err;
+    });
+  });
+}
+function ghErrorText(e){
+  if(!e||!e.status) return "Network error. Check your connection and try again.";
+  var resetTxt="";
+  if(e.reset){ var d=new Date(parseInt(e.reset,10)*1000); resetTxt=" GitHub rate limit resets at "+d.toLocaleTimeString()+"."; }
+  if(e.status===404) return "Repo or branch not found (404). Check the URL. Private repos need a token with access to that repo.";
+  if(e.status===403) return "GitHub refused the request (403). "+(e.message||"")+(e.message&&e.message.indexOf("rate limit")!==-1?resetTxt+" Add a GitHub token above for 5,000 requests an hour instead of about 60.":"");
+  if(e.status===400||e.status===422) return "GitHub rejected the request (HTTP "+e.status+"). "+(e.message||"The repo may be too large for a full recursive tree, or the branch name is invalid. Try a /tree/<branch>/<folder> link to a smaller folder, or add a token.") ;
+  return "Could not fetch from GitHub (HTTP "+e.status+"). "+(e.message||"Check the URL and your connection.");
+}
+function ghRawURL(owner,repo,branch,path){
+  return "https://raw.githubusercontent.com/"+owner+"/"+repo+"/"+encodeURIComponent(branch)+"/"+path.split("/").map(function(s){ return encodeURIComponent(s); }).join("/");
+}
+function fetchGhFileContent(f,parsed,branch){
+  if(f.content!=null||f.fetching) return Promise.resolve(f);
+  f.fetching=true; renderGhFiles();
+  var url=ghRawURL(parsed.owner,parsed.repo,branch,f.name);
+  return fetch(url).then(function(r){
+    if(!r.ok) throw {status:r.status};
+    return r.text();
+  }).catch(function(){
+    /* raw.githubusercontent failed, fall back to the Contents API with the raw media type */
+    return fetch("https://api.github.com/repos/"+parsed.owner+"/"+parsed.repo+"/contents/"+f.name.split("/").map(function(s){ return encodeURIComponent(s); }).join("/")+"?ref="+encodeURIComponent(branch),{headers:Object.assign(ghHeaders(),{"Accept":"application/vnd.github.raw+json"})}).then(function(r){ if(!r.ok) throw {status:r.status}; return r.text(); });
+  }).then(function(txt){ f.content=txt; f.fetchError=null; })
+  .catch(function(e){ f.content=null; f.fetchError=(e&&e.status?("HTTP "+e.status):"network error"); })
+  .then(function(){ f.fetching=false; renderGhFiles(); updateRepoEstimate(); return f; });
+}
+function ghFilesFromTree(tree,parsed,branch){
+  var files=(tree.tree||[]).filter(function(n){ return n.type==="blob"; }).filter(function(n){
+    var p=n.path;
+    if(parsed.path && p.indexOf(parsed.path+"/")!==0 && p!==parsed.path) return false;
+    if(SKIP_DIRS.some(function(d){ return p.split("/").indexOf(d)!==-1; })) return false;
+    return CODE_EXTS.some(function(e){ return p.toLowerCase().endsWith(e); });
+  }).slice(0,60);
+  return files.map(function(n){ return {name:n.path,content:null,selected:false,source:"github",url:ghRawURL(parsed.owner,parsed.repo,branch,n.path)}; });
+}
+function ghContentsWalk(owner,repo,branch,path,depth,calls){
+  /* Fallback when the recursive tree is rejected or truncated: walk the Contents API one folder at a time. */
+  if(depth>3||calls.count>=20) return Promise.resolve([]);
+  calls.count++;
+  var url="/repos/"+owner+"/"+repo+"/contents/"+path.split("/").filter(function(s){ return s; }).map(function(s){ return encodeURIComponent(s); }).join("/")+"?ref="+encodeURIComponent(branch);
+  return gh(url).then(function(list){
+    if(!Array.isArray(list)) return [];
+    var out=[];
+    var subs=[];
+    list.forEach(function(n){
+      if(n.type==="file"&&CODE_EXTS.some(function(e){ return n.path.toLowerCase().endsWith(e); })&&!SKIP_DIRS.some(function(d){ return n.path.split("/").indexOf(d)!==-1; })) out.push({name:n.path,content:null,selected:false,source:"github",url:n.download_url||ghRawURL(owner,repo,branch,n.path)});
+      else if(n.type==="dir"&&!SKIP_DIRS.some(function(d){ return n.path.split("/").indexOf(d)!==-1; })) subs.push(n.path);
+    });
+    var chain=Promise.resolve(out);
+    subs.slice(0,8).forEach(function(sp){
+      chain=chain.then(function(acc){ return ghContentsWalk(owner,repo,branch,sp,depth+1,calls).then(function(more){ return acc.concat(more); }); });
+    });
+    return chain;
+  });
 }
 document.getElementById("gh-fetch").addEventListener("click",function(){
   var parsed=parseRepoURL(document.getElementById("gh-url").value);
   var status=document.getElementById("gh-status");
-  if(!parsed){ status.textContent="That URL did not parse as a GitHub repo. Use https://github.com/owner/repo, or a /tree/branch/path link."; return; }
+  if(!parsed){ status.textContent="That URL did not parse as a GitHub repo. Use https://github.com/owner/repo, owner/repo, or a /tree/branch/path link."; return; }
   status.innerHTML="<span class='spin'></span>Fetching file list for "+esc(parsed.owner)+"/"+esc(parsed.repo)+"...";
-  function gh(path){ return fetch("https://api.github.com"+path,{headers:{"Accept":"application/vnd.github+json"}}).then(function(r){ if(!r.ok) throw {status:r.status}; return r.json(); }); }
-  var branchP = parsed.branch ? Promise.resolve(parsed.branch) : gh("/repos/"+parsed.owner+"/"+parsed.repo).then(function(r){ return r.default_branch; });
-  branchP.then(function(branch){
-    return gh("/repos/"+parsed.owner+"/"+parsed.repo+"/git/trees/"+encodeURIComponent(branch)+"?recursive=1").then(function(tree){
-      var files=(tree.tree||[]).filter(function(n){ return n.type==="blob"; }).filter(function(n){
-        var p=n.path;
-        if(parsed.path && p.indexOf(parsed.path+"/")!==0 && p!==parsed.path) return false;
-        if(SKIP_DIRS.some(function(d){ return p.split("/").indexOf(d)!==-1; })) return false;
-        return CODE_EXTS.some(function(e){ return p.toLowerCase().endsWith(e); });
-      }).slice(0,60);
-      repoFiles=files.map(function(n){ return {name:n.path,content:null,selected:false,source:"github",url:"https://raw.githubusercontent.com/"+parsed.owner+"/"+parsed.repo+"/"+branch+"/"+n.path}; });
+  var repoInfoP=gh("/repos/"+parsed.owner+"/"+parsed.repo);
+  repoInfoP.then(function(info){
+    var defaultBranch=info.default_branch;
+    if(info.private&&!getGhToken()) status.innerHTML="<span class='spin'></span>This repo is private and no token was given, so GitHub will refuse it. Add a token with access to this repo, then fetch again.";
+    /* Resolve the branch: a /tree/ or /blob/ link may name a branch with slashes in it, so try the whole remainder first, then the first segment. */
+    var candidates=[];
+    if(parsed.ref){
+      candidates.push(parsed.ref);
+      var first=parsed.ref.split("/")[0];
+      if(first!==parsed.ref) candidates.push(first);
+    } else {
+      candidates.push(defaultBranch);
+    }
+    var tried=0;
+    function tryBranch(){
+      if(tried>=candidates.length) return Promise.reject({status:404,message:"Branch not found"});
+      var branch=candidates[tried++];
+      return gh("/repos/"+parsed.owner+"/"+parsed.repo+"/git/trees/"+encodeURIComponent(branch)+"?recursive=1").then(function(tree){
+        var branchPath=branch;
+        var path="";
+        if(parsed.ref){
+          if(parsed.ref===branch) path="";
+          else if(parsed.ref.indexOf(branch+"/")===0) path=parsed.ref.slice(branch.length+1);
+          else path="";
+        }
+        var p2={owner:parsed.owner,repo:parsed.repo,path:path};
+        var files=ghFilesFromTree(tree,p2,branch);
+        if(tree.truncated) status.textContent="Repo tree is over GitHub's 100,000 entry limit, so this list is partial. ";
+        return {branch:branch,files:files,truncated:!!tree.truncated};
+      }).catch(function(e){
+        if(tried<candidates.length&&(e.status===404||e.status===400||e.status===422)) return tryBranch();
+        throw e;
+      });
+    }
+    return tryBranch().catch(function(e){
+      /* Recursive tree rejected, e.g. repo too large: fall back to the Contents API walk. */
+      if(e.status===400||e.status===422||e.status===409){
+        var branch=candidates[0];
+        var path=parsed.ref&&parsed.ref.indexOf("/")!==-1?parsed.ref.slice(parsed.ref.indexOf("/")+1):"";
+        if(parsed.ref&&candidates.length>1&&parsed.ref.split("/").length>1) path=parsed.ref.slice(parsed.ref.split("/")[0].length+1);
+        return ghContentsWalk(parsed.owner,parsed.repo,branch,path,0,{count:0}).then(function(files){ return {branch:branch,files:files.slice(0,60),truncated:false,fallback:true}; });
+      }
+      throw e;
+    }).then(function(res){
+      repoFiles=res.files;
+      window._ghParsed=parsed; window._ghBranch=res.branch;
       renderGhFiles();
-      status.textContent=files.length+" code files found on branch "+branch+". Tick up to "+MAX_FILES+" to audit, then press Audit These Files. Files over 40 KB are skipped at run time.";
+      status.textContent=res.files.length+" code files found on branch "+res.branch+(res.fallback?" (via folder walk, recursive tree was rejected)":"")+". Tick files to fetch their contents, up to "+MAX_FILES+" to audit, then press Audit These Files. Files over 40 KB are skipped at run time.";
       updateRepoEstimate();
     });
   }).catch(function(e){
-    status.textContent = e&&e.status===404 ? "Repo or branch not found (404). Check the URL, and note this only works for public repos." : (e&&e.status===403 ? "GitHub rate limit (403). Unauthenticated GitHub allows about 60 requests an hour from your browser. Wait a while and try again." : "Could not fetch the file list: "+(e&&e.status?("HTTP "+e.status):"network error")+". Check the URL and your connection.");
+    status.textContent=ghErrorText(e);
   });
 });
 function renderGhFiles(){
@@ -1061,10 +1188,15 @@ function renderGhFiles(){
   host.innerHTML="";
   repoFiles.forEach(function(f,i){
     var li=document.createElement("li");
-    var cb=document.createElement("input"); cb.type="checkbox"; cb.setAttribute("aria-label","Include "+f.name);
-    cb.addEventListener("change",function(){ f.selected=cb.checked; updateRepoEstimate(); });
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.setAttribute("aria-label","Include "+f.name); cb.checked=!!f.selected;
+    cb.addEventListener("change",function(){
+      f.selected=cb.checked; updateRepoEstimate();
+      if(cb.checked&&f.content==null&&window._ghParsed&&window._ghBranch) fetchGhFileContent(f,window._ghParsed,window._ghBranch);
+    });
     var nm=document.createElement("span"); nm.className="fname"; nm.textContent=f.name;
-    li.appendChild(cb); li.appendChild(nm); host.appendChild(li);
+    var st=document.createElement("span"); st.className="fmeta";
+    st.textContent=f.fetching?"fetching...":(f.content!=null?(f.content.length.toLocaleString()+" chars"):(f.fetchError?("fetch failed: "+f.fetchError):"not fetched"));
+    li.appendChild(cb); li.appendChild(nm); li.appendChild(st); host.appendChild(li);
   });
   if(!repoFiles.length) host.innerHTML="<li>No code files found in that repo path.</li>";
 }
@@ -1083,7 +1215,7 @@ document.getElementById("zip-input").addEventListener("change",function(){
     return Promise.all(loads).then(function(all){
       repoFiles=all.filter(function(f){ return f; });
       var host=document.getElementById("zip-files");
-      host.innerHTML=repoFiles.map(function(f){ return "<li><span class='fname'>"+esc(f.name)+"</span><span class='fmeta'>"+f.content.length.toLocaleString()+" chars</span></li>"; }).join("")||"<li>No code files found in that zip.</li>";
+      host.innerHTML=repoFiles.map(function(f){ return "<li><span class='fname'>"+esc(f.name)+"</span><span class='fmeta'>"+(f.content||"").length.toLocaleString()+" chars</span></li>"; }).join("")||"<li>No code files found in that zip.</li>";
       status.textContent=repoFiles.length+" code files read from the zip. They will run with the pasted files, up to "+MAX_FILES+" files per run.";
       updateRepoEstimate();
     });
@@ -1104,8 +1236,6 @@ document.getElementById("repo-run").addEventListener("click",function(){
   var checks=selectedChecks();
   if(!checks.length){ toast("Tick at least one check first"); return; }
   var files=collectPasteFiles().concat(collectRepoFiles());
-  var skipped=files.filter(function(f){ return f.content==null||f.content.length>MAX_FILE_BYTES; });
-  files=files.filter(function(f){ return f.content!=null&&f.content.length<=MAX_FILE_BYTES; }).slice(0,MAX_FILES);
   if(!files.length){ toast("No files to audit. Add files, or tick files in the GitHub list."); return; }
   var model=repoModel.value;
   repoStop=false;
@@ -1114,6 +1244,15 @@ document.getElementById("repo-run").addEventListener("click",function(){
   var prog=document.getElementById("repo-progress"); prog.style.display="block"; prog.className="progress";
   var bar=prog.querySelector("i"); var status=document.getElementById("repo-status");
   var host=document.getElementById("repo-results"); host.innerHTML="";
+  status.innerHTML="<span class='spin'></span>Fetching contents for "+files.length+" file(s) first...";
+  var unfetched=files.filter(function(f){ return f.content==null&&f.source==="github"&&window._ghParsed&&window._ghBranch; });
+  Promise.all(unfetched.map(function(f){ return fetchGhFileContent(f,window._ghParsed,window._ghBranch); })).then(function(){
+    var skipped=files.filter(function(f){ return f.content==null||(f.content||"").length>MAX_FILE_BYTES; });
+    files=files.filter(function(f){ return f.content!=null&&(f.content||"").length<=MAX_FILE_BYTES; }).slice(0,MAX_FILES);
+    if(!files.length){ btn.disabled=!getKey(); stopBtn.style.display="none"; prog.style.display="none"; status.textContent="No files could be fetched to audit. "+(skipped.length?skipped.length+" file(s) failed to fetch or are over 40 KB. ":"")+"Check the GitHub token note above, or paste the files instead."; return; }
+    startAudit(files,skipped);
+  });
+  function startAudit(files,skipped){
   var done=0, totalCost=0, totalFindings=0, noFindingFiles=0, errorFiles=0;
   var fileResults=[];
   function step(i){
@@ -1147,6 +1286,7 @@ document.getElementById("repo-run").addEventListener("click",function(){
     document.getElementById("report").scrollIntoView({behavior:"smooth"});
   }
   step(0);
+  }
 });
 function renderRepoFile(f,findings,res,cost,errText){
   var host=document.getElementById("repo-results");
