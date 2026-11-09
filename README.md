@@ -1,3 +1,7 @@
+## 2026-11-09 rebuild: the site is now a live security audit tool, no leaderboard
+
+The homepage is a product, not a score table. Paste code or a scanner finding, pick any of the 81 GMI models, and get a live verdict with severity, confidence and a suggested fix, using your own GMI key (sessionStorage only, sent only to api.gmi-serving.com). Modes: one model, compare 2-3 models side by side, or two-stage (low-cost first pass, second model only if unsure, threshold 0.8, max_tokens 800 or 1200). Repo audit: paste files, fetch a public GitHub repo, or upload a zip, pick checks, one model call per file, no invented findings. Report: export Markdown or JSON, saved runs in sessionStorage only. Trust section at the bottom only: 50 findings, 25 real / 25 false positives, 25 models tested, prompt shown, links to this README and dataset.json. No leaderboard, no model lists, no winners, no best-model picks anywhere on the site. The benchmark data stays in the repo as evidence (results-all.json, dataset.json, models-82.json) and is not shown on the site. No model benchmark runs were made for this rebuild, and the left-models run is stopped: no new scores were merged.
+
 ## v2, 2026-11-08: real GMI theme, Live Triage, your own key
 
 v1 used a dark navy theme (#05070d) with blue/teal accents. That was wrong.
