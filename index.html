@@ -406,6 +406,28 @@ select,input[type=search],input[type=text].txt,textarea{font-family:var(--mono);
 .benchrun{margin-top:20px;border-top:1px solid var(--rule-dark);padding-top:20px}
 .small-note{font-family:var(--mono);font-size:12px;color:#a8a8a0;line-height:1.7;margin-top:10px}
 
+.mode-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.modebtn{background:#000;border:1px solid var(--rule-dark);color:#e8e8e0;font-size:12.5px;padding:11px 15px;letter-spacing:.06em;text-transform:uppercase}
+.modebtn:hover{border-color:var(--lime2);color:var(--lime2)}
+.modebtn.active{background:var(--lime2);border-color:var(--lime2);color:#000}
+.ts-panel{margin-top:14px;border:1px solid var(--rule-dark);background:#000;padding:16px}
+.ts-panel .flabel{margin-top:0}
+.ts-row{display:flex;gap:14px;flex-wrap:wrap;align-items:end}
+.ts-field{flex:1 1 160px}
+.ts-field select{width:100%;background:#000;border:1px solid var(--rule-dark);color:#f2f2ec;padding:11px 12px;font-family:var(--mono);font-size:13.5px}
+.ts-field input[type=range]{width:100%;accent-color:#DDEA4D}
+.ts-fixed{font-family:var(--mono);font-size:13px;color:#f2f2ec;line-height:1.9}
+.ts-fixed b{color:var(--lime2)}
+.stage-box{border:1px solid var(--rule-dark);background:#000;padding:14px 16px;margin-bottom:12px;font-family:var(--mono);font-size:13px;color:#e8e8e0;line-height:1.8}
+.stage-box h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime2);margin:0 0 6px}
+.stage-box .warn{color:#fcd9a0}
+.stage-box .fail{color:#fca5a5}
+.worth-list{margin-top:16px;border-top:1px solid #cfcfcf;padding-top:14px}
+.worth-list h4{font-size:15px;margin:0 0 8px}
+.worth-list ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7;color:#2b2b2b}
+.worth-list li{margin-bottom:8px}
+.worth-list .mono{font-family:var(--mono);font-size:12.5px}
+
 /* ---------- Models / dataset (light) ---------- */
 .filters{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;align-items:end}
 .field{display:flex;flex-direction:column;gap:6px}
@@ -494,7 +516,7 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
     <div class="sec-head">
       <p class="eyebrow"><span class="dot">&#9679;</span> Live Triage</p>
       <h2>Triage your own code, live</h2>
-      <p>Paste real code, a semgrep or osv-scanner finding, or a CVE description. Pick any of the 82 verified GMI models. The verdict comes straight from the GMI Inference API, called from your browser with your key.</p>
+      <p>Paste real code, a semgrep or osv-scanner finding, or a CVE description. Pick any of the 82 verified GMI models, or use Two-stage mode: Gemini 3.5 Flash Lite first, then GPT-6.1 Sol only when Gemini is unsure. The verdict comes straight from the GMI Inference API, called from your browser with your key. Two-stage added 2026-11-09, smoke-tested on 5 hardest findings.</p>
     </div>
 
     <div class="keybox">
@@ -515,6 +537,27 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
         <label class="flabel" for="triage-model">Model</label>
         <select id="triage-model" aria-label="Model for live triage"></select>
         <div class="pricebox" id="triage-price"></div>
+        <label class="flabel">Triage mode</label>
+        <div class="mode-row" role="group" aria-label="Triage mode">
+          <button class="modebtn active" id="mode-single" type="button" aria-pressed="true">Single model</button>
+          <button class="modebtn" id="mode-two" type="button" aria-pressed="false">Two-stage</button>
+        </div>
+        <div class="ts-panel" id="two-stage-panel" style="display:none">
+          <label class="flabel">Two-stage triage</label>
+          <p class="ts-fixed">Stage 1: <b>google/gemini-3.5-flash-lite</b><br>Stage 2 (only if escalated): <b>openai/gpt-6.1-sol</b><br>Escalate when Stage 1 confidence is below the threshold, or its verdict is unparsed, or Stage 1 errors. If Stage 2 errors (502/503), the Stage 1 verdict is kept and the failure is flagged, it is not silently presented as a two-stage result.</p>
+          <div class="ts-row">
+            <div class="ts-field">
+              <label class="flabel" for="ts-threshold">Confidence threshold: <span id="ts-threshold-val">0.80</span></label>
+              <input type="range" id="ts-threshold" min="0.5" max="0.95" step="0.05" value="0.8" aria-label="Confidence threshold">
+            </div>
+            <div class="ts-field">
+              <label class="flabel" for="ts-max-tokens">max_tokens, both stages</label>
+              <select id="ts-max-tokens" aria-label="max_tokens for both stages"><option value="800" selected>800</option><option value="1200">1200</option></select>
+            </div>
+          </div>
+          <div class="pricebox" id="ts-estimate"></div>
+          <p class="small-note">Smoke test, 5 hardest findings, 2026-11-09, $0.007758 total, 22 calls: Gemini 3.5 Flash Lite alone 4/5, two-stage Gemini + Sol 4/5, Stage 2 never fired on those 5 because Gemini confidences were 1.0, 0.95, 0.9, 0.9, 1.0, all at or above the 0.8 threshold. Two-stage equalled Gemini alone, it did not beat it. Sol alone 2/5 counting errors as wrong, 3 of 5 calls HTTP 503 no eligible worker, intermittently unavailable. Re-run on the full 50 before claiming two-stage accuracy. max_tokens 500 was not tested, only 800 was used here. Prompt caching gave 0 cached tokens for all models that day, so no saving is budgeted from caching.</p>
+        </div>
         <label class="flabel">Load an example</label>
         <div class="exrow">
           <button class="exbtn" type="button" data-ex="log4shell">1 &middot; Log4Shell, CVE-2021-44228, Log4j JNDI RCE</button>
@@ -544,6 +587,7 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
       <div class="tpanel">
         <h3>Verdict</h3>
         <div id="verdict-empty" class="vmeta">No verdict yet. Run a triage and the model's answer appears here: verdict, severity, confidence, reason and suggested fix, plus latency and token usage returned by the API.</div>
+        <div id="ts-stages" style="display:none"></div>
         <div class="verdict-out" id="verdict-out" style="display:none">
           <div class="vstep" id="vs-badge"></div>
           <div class="vstep" id="vs-meta"></div>
@@ -608,9 +652,23 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
           <button class="rec-pick" data-pri="cheapest">Cheapest</button>
           <button class="rec-pick" data-pri="value">Best value</button>
           <button class="rec-pick" data-pri="coding">Best for coding &amp; security triage</button>
-          <button class="rec-pick" data-pri="strongest">Strongest overall</button>
+          <button class="rec-pick" data-pri="strongest">Strongest overall, scored only</button>
         </div>
         <div id="rec-out"></div>
+        <div class="worth-list" id="worth-testing">
+          <h4>Worth testing next</h4>
+          <p style="font-family:var(--mono);font-size:12.5px;color:var(--ink2);margin:0 0 10px;line-height:1.7">Untested models, no rank, no accuracy claimed. Prices are real per-token prices from the live list. Run them in Live Triage on your own findings before trusting them.</p>
+          <ul>
+            <li><span class="mono">Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8</span> - $0.000000900 prompt / $0.000004500 completion per token. Specialist coder model, untested on this dataset.</li>
+            <li><span class="mono">openai/gpt-6.1-sol</span> - $0.000002000 prompt / $0.000010000 completion per token. Smoke test only, 5 findings, perfect at $0.009372 per finding in the 2026-11-08 smoke test, and intermittently unavailable: 3 of 5 solo calls HTTP 503 on 2026-11-09.</li>
+            <li><span class="mono">openai/gpt-5.6-sol</span> - $0.000005000 prompt / $0.000030000 completion per token. Untested, higher per-token price than Sol.</li>
+            <li><span class="mono">openai/gpt-5.4-pro</span> - $0.000030000 prompt / $0.000180000 completion per token. Untested, the highest per-token price in the list.</li>
+            <li><span class="mono">deepseek-ai/DeepSeek-V4-Pro</span> - $0.000001740 prompt / $0.000003480 completion per token. Untested.</li>
+            <li><span class="mono">nvidia/nemotron-3-ultra-550b-a55b</span> - $0.000000800 prompt / $0.000002600 completion per token. Untested.</li>
+            <li><span class="mono">Qwen/Qwen3-235B-A22B-Instruct-2507-FP8</span> - $0.000000350 prompt / $0.000001400 completion per token. Untested, and unavailable on 2026-11-08 with HTTP 503 no eligible worker.</li>
+            <li><span class="mono">moonshotai/Kimi-K2.5</span> - $0.000000600 prompt / $0.000003000 completion per token. Untested.</li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -997,8 +1055,8 @@ var REC={
  fastest:{id:"MiniMaxAI/MiniMax-M3",why:"Fastest verified average latency among the 22 scored models: MiniMaxAI/MiniMax-M3 at 1.64s per finding, accuracy 0.920. The fastest perfect model is google/gemini-3.5-flash-lite at 2.87s per finding with accuracy 1.000, so pick M3 for raw speed and Gemini when the verdict has to be right."},
  cheapest:{id:"XiaomiMiMo/MiMo-V2.6-Flash",why:"Cheapest verified scored run: XiaomiMiMo/MiMo-V2.6-Flash cost $0.002579 in total for all 50 findings, $0.000052 per finding, with accuracy 0.960 and F1 0.962. If you need perfect accuracy instead, google/gemini-3.5-flash-lite is the best value at $0.006663 total."},
  value:{id:"google/gemini-3.5-flash-lite",why:"Best value is accuracy per dollar, and Gemini leads on both sides of that trade: accuracy 1.000 at the lowest cost per finding, $0.000133, and the lowest latency. Qwen3.8-Flash is the runner-up, also perfect, at $0.000157 per finding."},
- coding:{id:"Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8",why:"For code-focused work, Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8 is the specialist coder model in the verified list, at $0.000000900 prompt and $0.000004500 completion per token. It is UNTESTED on this dataset, so no accuracy is claimed for it. The tested fallback is Qwen/Qwen3.8-Flash, perfect at 50 of 50. Run the coder model in Live Triage on your own findings before trusting it."},
- strongest:{id:"openai/gpt-6.1-sol",why:"The strongest model with any measured result on this page is openai/gpt-6.1-sol: it passed a 5-finding smoke test with precision, recall and accuracy all at 1.000. That is a smoke test, not a full benchmark. It is also by far the most expensive option measured, $0.009372 per finding in that smoke test, roughly 70 times the cost of Gemini per finding. openai/gpt-5.6-sol and openai/gpt-5.4-pro list even higher per-token prices and are fully untested."}
+ coding:{id:"Qwen/Qwen3.8-Flash",why:"Best for coding and security triage, scored only: Qwen/Qwen3.8-Flash was perfect, 50 of 50, accuracy 1.000, precision 1.000, recall 1.000, at $0.000157 per finding, $0.007836 for all 50. The specialist coder model Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8 is UNTESTED on this dataset, so it is not a recommender pick. It is listed under Worth testing next below."},
+ strongest:{id:"google/gemini-3.5-flash-lite",why:"Strongest overall, scored only: google/gemini-3.5-flash-lite was perfect, 50 of 50, accuracy 1.000, at the lowest cost of the three perfect models, $0.000133 per finding, $0.006663 for all 50, and the fastest of the three at 2.87s. openai/gpt-6.1-sol is NOT a recommender pick: it passed only a 5-finding smoke test, not a full benchmark, at $0.009372 per finding, and in the 2026-11-09 two-stage smoke test 3 of its 5 solo calls returned HTTP 503 no eligible worker. It is listed under Worth testing next below."}
 };
 function renderRec(pri){
   var r=REC[pri]; var e50=estCost(r.id,50);
@@ -1182,12 +1240,14 @@ var TRIAGE_PROMPT='You are a security code reviewer. Classify this finding. A fi
 var lastVerdict=null;
 function showTriageError(msg){ var e=document.getElementById("triage-error"); e.style.display="block"; e.textContent=msg; }
 function hideTriageError(){ document.getElementById("triage-error").style.display="none"; }
-function callGMI(key,model,text){
+function callGMIWithTokens(key,model,text,maxTokens){
   var t0=performance.now();
-  return gmiFetch("https://api.gmi-serving.com/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({model:model,temperature:0,max_tokens:2500,messages:[{role:"user",content:TRIAGE_PROMPT+text}]})},90000)
+  return gmiFetch("https://api.gmi-serving.com/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({model:model,temperature:0,max_tokens:maxTokens,messages:[{role:"user",content:TRIAGE_PROMPT+text}]})},90000)
     .then(function(r){ if(!r.ok) throw {status:r.status}; return r.json(); })
     .then(function(j){ return {json:j, latency:(performance.now()-t0)/1000}; });
 }
+function callGMI(key,model,text){ return callGMIWithTokens(key,model,text,2500); }
+function costFromUsage(usage,modelId){ var pr=priceOf(byId(modelId)); if(!pr||!usage||usage.prompt_tokens==null) return 0; return usage.prompt_tokens*pr.p+(usage.completion_tokens||0)*pr.c; }
 function parseTriage(j){
   try{
     var content=j.choices&&j.choices[0]&&j.choices[0].message?j.choices[0].message.content:"";
@@ -1197,9 +1257,93 @@ function parseTriage(j){
     return d;
   }catch(e){ return null; }
 }
+/* ---------- Two-stage triage: Stage 1 Gemini, Stage 2 Sol on escalation ---------- */
+var TS_STAGE1="google/gemini-3.5-flash-lite", TS_STAGE2="openai/gpt-6.1-sol";
+var triageMode="single";
+function tsThreshold(){ var el=document.getElementById("ts-threshold"); return el?parseFloat(el.value):0.8; }
+function tsMaxTokens(){ var el=document.getElementById("ts-max-tokens"); return el?parseInt(el.value,10):800; }
+function updateTwoStageEstimate(){
+  var el=document.getElementById("ts-estimate"); if(!el) return;
+  /* Observed smoke-test basis, 2026-11-09, max_tokens 800: Gemini $0.000233 per finding, Sol $0.001597 per successful call (2 successes, $0.00122 and $0.001974). 50 findings: Stage 1 $0.01165. 10% escalation (5 Sol calls) $0.01965, 20% (10 calls) $0.02765. At the earlier Sol smoke-test cost $0.009372 per finding, 10% is $0.05851 and 20% is $0.10537. Single-model Gemini alone for 50 is $0.01165, the same as two-stage at 0% escalation. */
+  el.innerHTML="Two-stage estimate, observed smoke-test basis at max_tokens "+tsMaxTokens()+": 1 finding <b>$0.000233</b> Stage 1 only, <b>$0.001830</b> if escalated to Sol. 50 findings: <b>$0.01165</b> at 0% escalation, <b>$0.01965</b> at 10%, <b>$0.02765</b> at 20%. Single-model Gemini alone for 50 is <b>$0.01165</b>. At the earlier Sol cost of $0.009372 per finding, 10% escalation is $0.05851 and 20% is $0.10537. Escalation rate on the full 50 is unknown, the 5-finding smoke test had 0% escalation.";
+}
+function setTriageMode(mode){
+  triageMode=mode;
+  var s1=document.getElementById("mode-single"), s2=document.getElementById("mode-two");
+  if(s1){ s1.classList.toggle("active",mode==="single"); s1.setAttribute("aria-pressed",mode==="single"?"true":"false"); }
+  if(s2){ s2.classList.toggle("active",mode==="two-stage"); s2.setAttribute("aria-pressed",mode==="two-stage"?"true":"false"); }
+  var p=document.getElementById("two-stage-panel"); if(p) p.style.display=mode==="two-stage"?"block":"none";
+  var st=document.getElementById("ts-stages"); if(st&&mode==="single") st.style.display="none";
+  if(mode==="two-stage") updateTwoStageEstimate();
+}
+document.getElementById("mode-single").addEventListener("click",function(){ setTriageMode("single"); });
+document.getElementById("mode-two").addEventListener("click",function(){ setTriageMode("two-stage"); });
+document.getElementById("ts-threshold").addEventListener("input",function(){ document.getElementById("ts-threshold-val").textContent=parseFloat(this.value).toFixed(2); updateTwoStageEstimate(); });
+document.getElementById("ts-max-tokens").addEventListener("change",updateTwoStageEstimate);
+function stageLine(label,model,res,parsed){
+  if(!res) return "<h4>"+label+" - "+model+"</h4><div>No call made.</div>";
+  if(res.error) return "<h4>"+label+" - "+model+"</h4><div class='fail'>Error: "+esc(res.error)+"</div>";
+  if(!parsed) return "<h4>"+label+" - "+model+"</h4><div class='warn'>Unparsed answer, no verdict extracted. Latency "+fmt(res.latency,2)+"s, cost "+money(costFromUsage(res.json.usage||{},model))+".</div>";
+  return "<h4>"+label+" - "+model+"</h4><div>Verdict <b>"+parsed.verdict+"</b> &middot; Severity "+esc(String(parsed.severity||"n/a"))+" &middot; Confidence "+(typeof parsed.confidence==="number"?fmt(parsed.confidence,2):"n/a")+"<br>Latency "+fmt(res.latency,2)+"s &middot; Tokens: prompt "+(res.json.usage&&res.json.usage.prompt_tokens!=null?res.json.usage.prompt_tokens:"n/a")+", completion "+(res.json.usage&&res.json.usage.completion_tokens!=null?res.json.usage.completion_tokens:"n/a")+" &middot; Cost "+money(costFromUsage(res.json.usage||{},model))+"</div>";
+}
+function runTwoStage(key,text,btn){
+  var threshold=tsThreshold(), mt=tsMaxTokens();
+  btn.disabled=true; btn.innerHTML="<span class='spin'></span>Stage 1: Gemini...";
+  var prog=document.getElementById("triage-progress"); prog.style.display="block"; prog.className="progress indet";
+  document.getElementById("verdict-out").style.display="none"; document.getElementById("ts-stages").style.display="none";
+  document.getElementById("verdict-empty").style.display="block"; document.getElementById("verdict-empty").innerHTML="<span class='spin'></span>Stage 1: google/gemini-3.5-flash-lite...";
+  var s1=null, s1d=null, s1err=null, s2=null, s2d=null, s2err=null, escalated=false, escFailed=false, escReason="";
+  callGMIWithTokens(key,TS_STAGE1,text,mt).then(function(res){ s1=res; s1d=parseTriage(res.json); }).catch(function(e){ s1err=e&&e.status?("HTTP "+e.status):(e&&e.timeout?"timeout after 90s":(e&&e.network?"network error":"error")); s1={error:s1err,latency:0,json:{usage:{}}}; }).then(function(){
+    var conf=(s1d&&typeof s1d.confidence==="number")?s1d.confidence:null;
+    if(s1err){ escalated=true; escReason="Stage 1 error ("+s1err+")"; }
+    else if(!s1d){ escalated=true; escReason="Stage 1 verdict unparsed"; }
+    else if(conf===null||conf<threshold){ escalated=true; escReason=conf===null?"Stage 1 confidence missing":"Stage 1 confidence "+fmt(conf,2)+" below threshold "+fmt(threshold,2); }
+    if(!escalated) return null;
+    document.getElementById("verdict-empty").innerHTML="<span class='spin'></span>Escalated ("+esc(s1err||escReason)+"): Stage 2: openai/gpt-6.1-sol...";
+    btn.innerHTML="<span class='spin'></span>Stage 2: Sol...";
+    return callGMIWithTokens(key,TS_STAGE2,text,mt).then(function(res){ s2=res; s2d=parseTriage(res.json); }).catch(function(e){ s2err=e&&e.status?("HTTP "+e.status):(e&&e.timeout?"timeout after 90s":(e&&e.network?"network error":"error")); s2={error:s2err,latency:0,json:{usage:{}}}; escFailed=true; });
+  }).then(function(){
+    var finalD=null, finalModel=null, finalRes=null;
+    if(s2d){ finalD=s2d; finalModel=TS_STAGE2; finalRes=s2; }
+    else if(s1d){ finalD=s1d; finalModel=TS_STAGE1; finalRes=s1; if(escalated) escFailed=true; }
+    var totalCost=costFromUsage(s1&&s1.json?s1.json.usage||{}:{},TS_STAGE1)+(s2?costFromUsage(s2.json?s2.json.usage||{}:{},TS_STAGE2):0);
+    var singleCost=costFromUsage(s1&&s1.json?s1.json.usage||{}:{},TS_STAGE1);
+    var stages=document.getElementById("ts-stages"); stages.style.display="block";
+    var html="<div class='stage-box'>"+stageLine("Stage 1",TS_STAGE1,s1,s1d)+"</div>";
+    if(!escalated) html+="<div class='stage-box'><h4>Stage 2 - "+TS_STAGE2+"</h4><div>Not fired. Stage 1 confidence "+(s1d&&typeof s1d.confidence==="number"?fmt(s1d.confidence,2):"n/a")+" was at or above the threshold "+fmt(threshold,2)+".</div></div>";
+    else html+="<div class='stage-box'>"+stageLine("Stage 2",TS_STAGE2,s2,s2d)+(escFailed&&s1d?"<div class='fail' style='margin-top:8px'>Escalation failed ("+esc(s2err||"Stage 2 unparsed")+"). Keeping the Stage 1 verdict below. This is NOT presented as a two-stage verified result.</div>":"")+"</div>";
+    html+="<div class='stage-box'><h4>Total cost</h4><div>Two-stage total <b>"+money(totalCost)+"</b> &middot; Single-model Gemini alone would have been <b>"+money(singleCost)+"</b> &middot; Extra cost from escalation <b>"+money(totalCost-singleCost)+"</b>"+(escalated?"":" &middot; No escalation, same cost as single-model Gemini")+"</div></div>";
+    stages.innerHTML=html;
+    if(!finalD){
+      document.getElementById("verdict-empty").textContent="No verdict yet.";
+      showTriageError("No verdict. Stage 1 "+(s1err?"errored ("+s1err+")":"was unparsed")+" and Stage 2 "+(s2err?"errored ("+s2err+")":"was unparsed")+". Nothing was invented. Try again, Sol is intermittently unavailable (HTTP 502/503).");
+      return;
+    }
+    lastVerdict={mode:"two-stage",stage1_model:TS_STAGE1,stage1_verdict:s1d?s1d.verdict:null,stage1_confidence:s1d?s1d.confidence:null,stage2_model:TS_STAGE2,stage2_fired:escalated,stage2_verdict:s2d?s2d.verdict:null,escalation_reason:escalated?escReason:null,escalation_failed:escFailed,threshold:threshold,max_tokens:mt,model:finalModel,verdict:finalD.verdict,severity:finalD.severity,confidence:finalD.confidence,reason:finalD.reason,fix:finalD.fix,latency_s:Math.round(finalRes.latency*100)/100,usage:finalRes.json.usage||{},total_cost_usd:Math.round(totalCost*1000000)/1000000,single_model_cost_usd:Math.round(singleCost*1000000)/1000000,at:new Date().toISOString()};
+    document.getElementById("verdict-empty").style.display="none";
+    var out=document.getElementById("verdict-out"); out.style.display="block";
+    var usage=finalRes.json.usage||{};
+    var steps=[
+      ["vs-badge","<span class='vbadge "+(finalD.verdict==="real"?"real":"fp")+"'>"+(finalD.verdict==="real"?"Real vulnerability":"False positive")+"</span>"],
+      ["vs-meta","<div class='vmeta'>Final verdict from <b>"+finalModel+"</b>"+(escFailed?" (escalation failed, Stage 1 verdict kept)":"")+"<br>Severity <b>"+esc(String(finalD.severity||"n/a"))+"</b> &middot; Confidence <b>"+(typeof finalD.confidence==="number"?fmt(finalD.confidence,2):esc(String(finalD.confidence||"n/a")))+"</b><br>Latency <b>"+fmt(finalRes.latency,2)+"s</b> &middot; Tokens: prompt "+(usage.prompt_tokens!=null?usage.prompt_tokens:"n/a")+", completion "+(usage.completion_tokens!=null?usage.completion_tokens:"n/a")+", total "+(usage.total_tokens!=null?usage.total_tokens:"n/a")+" &middot; Total cost <b>"+money(totalCost)+"</b> vs single-model Gemini <b>"+money(singleCost)+"</b></div>"],
+      ["vs-reason","<div class='vtext'><span class='vl'>Reason</span>"+esc(String(finalD.reason||""))+"</div>"],
+      ["vs-fix","<div class='vtext'><span class='vl'>Suggested fix</span>"+esc(String(finalD.fix||""))+"</div>"],
+      ["vs-actions",null]
+    ];
+    steps.forEach(function(s2x,i){ var el=document.getElementById(s2x[0]); if(s2x[1]!=null) el.innerHTML=s2x[1]; el.classList.remove("show"); setTimeout(function(){ el.classList.add("show"); }, 180*(i+1)); });
+  }).catch(function(e){
+    document.getElementById("verdict-empty").textContent="No verdict yet.";
+    showTriageError(e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90)+" No verdict was produced.":networkErrorText()+" No verdict was produced."));
+  }).then(function(){
+    btn.disabled=!getKey(); btn.textContent="Triage This Finding ↗";
+    prog.style.display="none"; prog.className="progress";
+  });
+}
+
 document.getElementById("triage-run").addEventListener("click",function(){
   var key=getKey(); var text=document.getElementById("triage-input").value.trim();
   hideTriageError();
+  if(triageMode==="two-stage"){ if(!key){ showTriageError("Add your GMI API key first. The triage button stays disabled until a key is entered."); return; } if(!text){ showTriageError("Paste a code snippet, a semgrep or osv finding, or a CVE description first."); return; } runTwoStage(key,text,this); return; }
   if(!key){ showTriageError("Add your GMI API key first. The triage button stays disabled until a key is entered."); return; }
   if(!text){ showTriageError("Paste a code snippet, a semgrep or osv finding, or a CVE description first."); return; }
   var btn=this; btn.disabled=true; btn.innerHTML="<span class='spin'></span>Calling GMI API...";
@@ -1228,7 +1372,7 @@ document.getElementById("triage-run").addEventListener("click",function(){
     prog.style.display="none"; prog.className="progress";
   });
 });
-document.getElementById("copy-verdict").addEventListener("click",function(){ if(!lastVerdict){ toast("No verdict to copy yet"); return; } copyText("Verdict: "+lastVerdict.verdict+"\nSeverity: "+lastVerdict.severity+"\nConfidence: "+lastVerdict.confidence+"\nReason: "+lastVerdict.reason+"\nFix: "+lastVerdict.fix+"\nModel: "+lastVerdict.model,"Verdict copied"); });
+document.getElementById("copy-verdict").addEventListener("click",function(){ if(!lastVerdict){ toast("No verdict to copy yet"); return; } var t="Verdict: "+lastVerdict.verdict+"\nSeverity: "+lastVerdict.severity+"\nConfidence: "+lastVerdict.confidence+"\nReason: "+lastVerdict.reason+"\nFix: "+lastVerdict.fix+"\nModel: "+lastVerdict.model; if(lastVerdict.mode==="two-stage"){ t+="\nMode: two-stage (Stage 1 "+lastVerdict.stage1_model+", Stage 2 "+lastVerdict.stage2_model+", threshold "+lastVerdict.threshold+", escalated: "+(lastVerdict.stage2_fired?"yes":"no")+", escalation failed: "+(lastVerdict.escalation_failed?"yes":"no")+", total cost: $"+lastVerdict.total_cost_usd+")"; } copyText(t,"Verdict copied"); });
 document.getElementById("export-verdict").addEventListener("click",function(){ if(!lastVerdict){ toast("No verdict to export yet"); return; } downloadJSON(lastVerdict,"triage-verdict.json"); });
 
 /* ---------- User-run benchmark ---------- */
