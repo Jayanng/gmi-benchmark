@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>Security Model Benchmark - GMI Cloud Inference Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#000000; --ink:#171717; --ink2:#525252; --muted:#a3a3a3;
+  --lime:#ddea4d; --lime2:#dcea4d; --lime-dark:#99a22f; --lime-deep:#4a4f17; --lime-pale:#e4e7d1;
+  --line-dark:#404040; --rule-dark:#4d4d4d; --line-light:#e5e5e5;
+  --paper:#ffffff; --grey-bg:#f6f6f6; --hero-grey:#dbd7d6; --offwhite:#f7f7f2; --media:#161616;
+  --red:#dc2626; --amber:#d97706;
+  --sans:"Archivo","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--black);color:var(--ink);font-family:var(--body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:var(--sans);letter-spacing:-.02em;margin:0}
+.mono{font-family:var(--mono)}
+.wrap{max-width:1500px;margin:0 auto;padding:0 clamp(20px,6vw,90px)}
+button{font-family:var(--mono);cursor:pointer}
+:focus-visible{outline:2px solid var(--lime-dark);outline-offset:2px}
+::selection{background:var(--lime);color:#000}
+
+/* ---------- Header ---------- */
+header{position:sticky;top:0;z-index:60;background:#000;border-bottom:1px solid var(--line-dark)}
+.header-in{max-width:1500px;margin:0 auto;padding:0 clamp(20px,6vw,90px);height:65px;display:flex;align-items:center;gap:22px}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--sans);font-weight:700;font-size:21px;letter-spacing:.02em;white-space:nowrap}
+.logo-blocks{display:grid;grid-template-columns:6px 6px;grid-template-rows:6px 6px;gap:2px}
+.logo-blocks i{background:#fff;display:block}
+.logo-blocks i:last-child{background:var(--lime)}
+nav.main{display:flex;gap:2px;margin-left:12px}
+nav.main button{background:none;border:none;color:#d6d6d6;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;transition:color .2s,background .2s}
+nav.main button:hover{color:var(--lime)}
+nav.main button.active{color:#000;background:var(--lime)}
+.header-cta{margin-left:auto;display:flex;gap:10px;align-items:center;flex:none}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:0 18px;height:40px;border-radius:0;text-decoration:none;transition:transform .15s,background .2s,color .2s,border-color .2s;white-space:nowrap}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn-lime{background:var(--lime);color:#000;border-color:var(--lime)}
+.btn-lime:hover{background:#eef79a}
+.btn-outline{background:transparent;color:#fff;border-color:#fff}
+.btn-outline:hover{border-color:var(--lime);color:var(--lime)}
+.btn-dark{background:#000;color:var(--lime);border-color:#000}
+.btn-dark:hover{background:#222}
+.btn-outline-dark{background:transparent;color:#000;border-color:#000}
+.btn-outline-dark:hover{background:#000;color:var(--lime)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+@media(max-width:900px){nav.main{display:none}.header-cta .btn-outline{display:none}}
+
+/* ---------- Hero ---------- */
+.hero{background:radial-gradient(900px 480px at 85% -120px,rgba(221,234,77,.14),transparent 60%),radial-gradient(700px 500px at 8% 110%,rgba(90,100,40,.25),transparent 55%),linear-gradient(160deg,#101010 0%,#000 55%,#0a0c04 100%);color:#fff;padding:96px 0 84px;position:relative;overflow:hidden}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--hero-grey);margin:0 0 26px}
+.eyebrow .dot{color:var(--lime)}
+.hero h1{font-size:clamp(42px,5.6vw,78px);line-height:1.04;font-weight:500;max-width:1000px}
+.hero h1 .lime{color:var(--lime)}
+.cursor{display:inline-block;width:.55em;height:.9em;background:var(--lime);vertical-align:-.08em;margin-left:6px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.glitch{animation:glitch .45s steps(2) 1.2s 1}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-3px,1px)}50%{transform:translate(3px,-1px)}75%{transform:translate(-2px,0)}100%{transform:translate(0)}}
+.hero-sub{font-family:var(--mono);color:var(--hero-grey);font-size:clamp(14px,1.4vw,16px);max-width:760px;margin:28px 0 0;line-height:1.75}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:38px}
+.btn-lg{height:46px;padding:0 24px;font-size:14px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:64px;border:1px solid var(--line-dark)}
+.hstat{padding:22px 24px;border-right:1px solid var(--line-dark);transition:background .25s}
+.hstat:last-child{border-right:none}
+.hstat:hover{background:#0d0d0d}
+.hstat .k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hstat .v{font-family:var(--mono);font-size:clamp(22px,2.4vw,32px);color:#fff;line-height:1.1}
+.hstat .v em{font-style:normal;color:var(--lime)}
+.hstat .s{font-family:var(--mono);font-size:12.5px;color:#bdbdbd;margin-top:7px;line-height:1.6}
+@media(max-width:900px){.hero-stats{grid-template-columns:1fr 1fr}.hstat:nth-child(2){border-right:none}.hstat:nth-child(1),.hstat:nth-child(2){border-bottom:1px solid var(--line-dark)}}
+@media(max-width:480px){.hero{padding:64px 0 56px}}
+
+/* ---------- Tabs ---------- */
+.tabbar{background:#000;border-bottom:1px solid var(--line-dark);position:sticky;top:65px;z-index:55}
+.tabbar{position:sticky}
+.tab-scroll-hint{display:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime);text-align:right;padding:4px 20px 0}
+@media(max-width:760px){.tab-scroll-hint{display:block}}
+.tabbar-in{max-width:1500px;margin:0 auto;padding:0 clamp(20px,6vw,90px);display:flex;gap:4px;flex-wrap:wrap;overflow-x:visible;scrollbar-width:none}
+@media(max-width:560px){.tabbar-in{flex-wrap:nowrap;overflow-x:auto;padding-right:34px;scroll-snap-type:x proximity}.tab{scroll-snap-align:start}.tabbar-in{mask-image:linear-gradient(to right,#000 88%,transparent 100%);-webkit-mask-image:linear-gradient(to right,#000 88%,transparent 100%)}}
+.tabbar-in::-webkit-scrollbar{display:none}
+.tab{background:none;border:none;border-bottom:3px solid transparent;color:#cfcfcf;font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:16px 18px 13px;transition:color .2s,border-color .2s;white-space:nowrap}
+.tab:hover{color:var(--lime)}
+.tab.active{color:var(--lime);border-bottom-color:var(--lime)}
+
+/* ---------- Sections ---------- */
+section{padding:88px 0}
+.sec-black{background:#000;color:#fff}
+.sec-dark{background:#0a0a0a;color:var(--offwhite)}
+.sec-white{background:#fff;color:var(--ink);background-image:radial-gradient(#e8e8e2 1px,transparent 1px);background-size:22px 22px}
+.sec-grey{background:var(--grey-bg);color:var(--ink)}
+.sec-head{margin-bottom:36px}
+.sec-head h2{font-size:clamp(32px,3.6vw,52px);font-weight:550;line-height:1.1}
+.sec-head p{font-family:var(--mono);font-size:14.5px;max-width:820px;margin:14px 0 0;line-height:1.75}
+.sec-black .sec-head p,.sec-dark .sec-head p{color:#c9c9c9}
+.sec-white .sec-head p,.sec-grey .sec-head p{color:var(--ink2)}
+
+/* cards on black */
+.dcard{border:1px solid var(--line-dark);background:#000;padding:26px;transition:transform .25s,border-color .25s,box-shadow .25s}
+.dcard:hover{transform:translateY(-4px);border-color:var(--lime);box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.wcard{background:#fff;border:1px solid var(--line-light);padding:26px;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:transform .25s,box-shadow .25s,border-color .25s}
+.wcard:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,.10);border-color:#cfcfcf}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+@media(max-width:1000px){.grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+@media(max-width:560px){.grid4{grid-template-columns:1fr}}
+
+/* tables */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-dark);background:#000}
+.table-wrap.light{border-color:var(--line-light);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+thead th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;text-align:left;padding:13px 14px;white-space:nowrap}
+.sec-black thead th{background:#0d0d0d;color:#bdbdbd;border-bottom:1px solid var(--line-dark)}
+.table-wrap.light thead th{background:#fafafa;color:var(--ink2);border-bottom:1px solid var(--line-light)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--lime-dark)}
+.sec-black th.sortable:hover{color:var(--lime)}
+th .arr{color:var(--lime-dark);font-size:10px}
+.sec-black th .arr{color:var(--lime)}
+tbody td{padding:13px 14px;vertical-align:middle}
+.sec-black tbody td{border-bottom:1px solid #242424}
+.table-wrap.light tbody td{border-bottom:1px solid #f0f0f0}
+tbody tr{transition:background .15s,opacity .2s}
+.sec-black tbody tr:hover{background:#0d0d0d}
+.table-wrap.light tbody tr:hover{background:#fbfbe f}
+.table-wrap.light tbody tr:hover{background:#fbfbf5}
+tbody tr.off{opacity:.32}
+.num{font-family:var(--mono);font-size:13px;text-align:right}
+th.num{text-align:right}
+.model-name{font-weight:600;font-size:14px;font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
+.rank{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 5px;background:var(--lime);color:#000;font-family:var(--mono);font-weight:600;font-size:12px;margin-right:9px;vertical-align:middle}
+.rank.grey{background:#e7e7e7;color:#000}
+.perfect{color:var(--lime-deep);font-weight:600}
+.sec-black .perfect{color:var(--lime)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 8px;letter-spacing:.04em;text-transform:uppercase;border:1px solid}
+.pill-ok{background:var(--lime-pale);color:var(--lime-deep);border-color:#c9cfa3}
+.pill-miss{background:#fdecec;color:var(--red);border-color:#f3b8b8}
+.pill-unp{background:#fdf3e3;color:var(--amber);border-color:#ecd3a3}
+.pill-real{background:#111;color:#fff;border-color:#111}
+.sec-black .pill-real{background:var(--lime);color:#000;border-color:var(--lime)}
+.pill-fp{background:#fff;color:var(--ink2);border-color:#cfcfcf}
+.pill-untested{background:#fff;color:var(--amber);border-color:var(--amber)}
+.pill-unavail{background:#2a0808;color:#fca5a5;border-color:var(--red)}
+tr.unavail-row td{color:#a8a8a8}
+.unavail-err{display:block;font-family:var(--mono);font-size:11px;color:#fca5a5;margin-top:5px;line-height:1.5;overflow-wrap:anywhere}
+.toggle-chip.active{background:var(--lime);color:#000;border-color:var(--lime)}
+.sev{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.sev-critical{color:var(--red);font-weight:600}.sev-high{color:#ea580c}.sev-medium{color:var(--amber)}.sev-low{color:var(--ink2)}
+.table-note{font-family:var(--mono);font-size:12.5px;margin-top:12px;line-height:1.7}
+.sec-black .table-note{color:#a8a8a8}.sec-white .table-note,.sec-grey .table-note{color:var(--ink2)}
+.toggle-chip{font-family:var(--mono);font-size:12px;padding:7px 12px;border:1px solid var(--line-dark);background:#000;color:#e8e8e8;transition:all .2s}
+.toggle-chip:hover{border-color:var(--lime);color:var(--lime)}
+.toggle-chip.off{opacity:.4;text-decoration:line-through}
+.chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.chiprow .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+
+/* charts */
+.chart-panel h3{font-size:19px;font-weight:600;margin-bottom:4px}
+.chart-panel .sub{font-family:var(--mono);font-size:12.5px;margin:0 0 18px;line-height:1.7}
+.sec-black .chart-panel .sub{color:#a8a8a8}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;margin-bottom:14px}
+.sec-black .legend{color:#bdbdbd}
+.dot-sq{width:10px;height:10px;display:inline-block;margin-right:6px;vertical-align:-1px}
+.group{margin-bottom:16px}
+.glabel{font-family:var(--mono);font-size:12.5px;font-weight:600;margin-bottom:7px;overflow-wrap:anywhere}
+.barrow{display:grid;grid-template-columns:74px 1fr 54px;align-items:center;gap:10px;margin-bottom:5px;font-size:12px}
+.barrow .bl{font-family:var(--mono);color:var(--ink2)}
+.sec-black .barrow .bl{color:#a8a8a8}
+.barrow .bv{font-family:var(--mono);text-align:right}
+.track{height:10px;background:#e9e9e9;overflow:hidden;cursor:pointer}
+.sec-black .track{background:#242424}
+.fill{height:100%;background:var(--lime);transition:width .5s ease}
+.fill.alt{background:var(--lime-dark)}
+.fill.grey{background:#8a8a8a}
+.hbar{display:grid;grid-template-columns:minmax(120px,190px) 1fr 92px;align-items:center;gap:12px;margin-bottom:12px;font-size:13px}
+.hbar .hl{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}
+.hbar .hv{font-family:var(--mono);text-align:right;font-size:13px}
+.hbar .track{height:16px}
+.axis-note{font-family:var(--mono);font-size:12px;margin-top:8px;line-height:1.7}
+.sec-black .axis-note{color:#8f8f8f}.sec-white .axis-note{color:var(--ink2)}
+#tooltip{position:fixed;z-index:200;pointer-events:none;background:#000;color:#fff;border:1px solid var(--lime);font-family:var(--mono);font-size:12px;padding:8px 11px;display:none;max-width:280px;line-height:1.6;box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.scatter-wrap{display:flex;justify-content:center}
+.scatter-pt{cursor:pointer}
+.scatter-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-family:var(--mono);font-size:12px;color:#d8d8d8;line-height:1.6}
+.sl-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:-1px}
+.sl-dia{width:9px;height:9px;display:inline-block;margin-right:8px;transform:rotate(45deg);border:1.5px solid var(--lime);vertical-align:-1px}
+
+/* model cards */
+.mcard h3{font-family:var(--mono);font-size:14.5px;font-weight:600;overflow-wrap:anywhere}
+.mcard .score{font-family:var(--mono);font-size:12.5px;margin:6px 0 12px}
+.sec-black .mcard .score{color:#bdbdbd}
+.mcard .score b{color:var(--lime-deep)}
+.sec-black .mcard .score b{color:var(--lime)}
+.mcard ul{margin:0;padding:0;list-style:none}
+.mcard li{padding:8px 0 8px 22px;position:relative;font-size:14px;border-top:1px solid}
+.sec-black .mcard li{border-color:#242424;color:#e2e2e2}
+.sec-white .mcard li{border-color:#f0f0f0;color:#2b2b2b}
+.mcard li:first-child{border-top:none}
+.mcard li::before{position:absolute;left:0;top:8px;font-family:var(--mono);font-size:12px;font-weight:700}
+.mcard li.good::before{content:"+";color:var(--lime-dark)}
+.mcard li.bad::before{content:"!";color:var(--amber)}
+.mcard .foot{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.miss{border:1px solid var(--amber);background:#fffdf6;padding:24px;transition:transform .25s}
+.miss:hover{transform:translateY(-3px)}
+.miss h3{font-size:16.5px;margin-bottom:8px}
+.miss h3 .mono{color:var(--amber)}
+.miss p{margin:0 0 8px;font-size:14px;color:#333}
+.miss p:last-child{margin:0;font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+
+/* smoke test banner */
+.smoke{border:1px solid var(--amber);background:#fffdf6;padding:24px 26px;margin-top:18px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.smoke h3{font-size:17px}
+.smoke p{font-family:var(--mono);font-size:12.5px;color:#5c4a12;margin:6px 0 0;line-height:1.7;max-width:640px}
+.smoke .nums{font-family:var(--mono);font-size:13px;display:flex;gap:22px;flex-wrap:wrap}
+.smoke .nums b{display:block;font-size:19px;color:#000}
+
+/* takeaway */
+.takeaway{border:1px solid var(--lime);background:#0d0f02;padding:24px 26px;margin-top:20px}
+.takeaway h3{font-size:17px;color:var(--lime)}
+.takeaway p{margin:8px 0 0;font-family:var(--mono);font-size:13.5px;color:#e8e8e2;line-height:1.8}
+.takeaway b{color:#fff}
+</style>
+</head>
+<body>
+<div id="tooltip" role="status"></div>
+
+<header>
+  <div class="header-in">
+    <div class="logo"><span class="logo-blocks"><i></i><i></i><i></i><i></i></span>GMI</div>
+    <nav class="main" aria-label="Sections">
+      <button data-goto="benchmark" class="active">Benchmark</button>
+      <button data-goto="triage">Live Triage</button>
+      <button data-goto="models">Models</button>
+      <button data-goto="dataset">Dataset</button>
+    </nav>
+    <div class="header-cta">
+      <a class="btn btn-outline" href="#methodology">Methodology</a>
+      <a class="btn btn-lime" href="#triage">Run Live Triage &#8599;</a>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow"><span class="dot">&#9679;</span> GMI Cloud Inference Engine &middot; Run 2026-11-08</p>
+    <h1 class="glitch"><span class="lime">Security triage,</span> measured.<span class="cursor" aria-hidden="true"></span></h1>
+    <p class="hero-sub">34 GMI models were attempted on the same 50 security findings, 25 real vulnerabilities and 25 false positives, with one prompt at temperature 0. 22 returned scores, 12 were unavailable on the day. Three scored a perfect 50 of 50. Then take any model from the full 82-model catalogue and triage your own code, live, with your own GMI API key.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-lime btn-lg" href="#triage">Run Live Triage &#8599;</a>
+      <a class="btn btn-outline btn-lg" href="#benchmark">View Benchmark &#8599;</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="k">Best accuracy</div><div class="v"><em>1.000</em></div><div class="s">Gemini 3.5 Flash Lite, Qwen3.8-Flash and DeepSeek V4 Flash Vision Exp, all perfect at 50 of 50.</div></div>
+      <div class="hstat"><div class="k">Models attempted</div><div class="v">34</div><div class="s">22 scored on all 50 findings. 12 unavailable, flagged with their HTTP error, never scored as zero.</div></div>
+      <div class="hstat"><div class="k">Best value</div><div class="v">$0.006663</div><div class="s">Gemini 3.5 Flash Lite: a perfect 50-finding run for $0.006663 total, $0.000133 per finding.</div></div>
+      <div class="hstat"><div class="k">Total spend vs cap</div><div class="v">$0.75<em> / $5</em></div><div class="s">This pass cost $0.696507. Grand total for the whole project is about $0.75, well under the $5 cap.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar" role="tablist" aria-label="Page sections"><div class="tab-scroll-hint" aria-hidden="true">Swipe tabs &#8250;</div>
+  <div class="tabbar-in">
+    <button class="tab active" data-tab="benchmark" role="tab">Benchmark</button>
+    <button class="tab" data-tab="triage" role="tab">Live Triage</button>
+    <button class="tab" data-tab="models" role="tab">Models</button>
+    <button class="tab" data-tab="dataset" role="tab">Dataset</button>
+  </div>
+</div>
+
+<!-- ================= BENCHMARK ================= -->
+<section class="sec-black tabpanel" id="benchmark" data-panel="benchmark">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="dot" style="color:var(--lime)">&#9679;</span> Benchmark</p>
+      <h2>The leaderboard</h2>
+      <p>Exact verified results from 2026-11-08: 34 models attempted on the 50-finding v1 dataset, same prompt, temperature 0. 22 scored, 12 were unavailable and are flagged as unavailable with their HTTP error, never as zero scores. Click a column heading to sort, filter by status, or search by name. Use the toggles to show or hide a scored model in the charts.</p>
+    </div>
+    <div class="chiprow" id="lb-filters"><span class="lbl">Show</span>
+      <button class="toggle-chip lb-filter active" data-filter="all" type="button">All 34</button>
+      <button class="toggle-chip lb-filter" data-filter="scored" type="button">Scored 22</button>
+      <button class="toggle-chip lb-filter" data-filter="unavailable" type="button">Unavailable 12</button>
+      <input type="search" id="lb-search" placeholder="Search models..." aria-label="Search leaderboard models" style="font-family:var(--mono);font-size:12.5px;background:#000;border:1px solid var(--line-dark);color:#fff;padding:8px 12px;min-width:190px;border-radius:0">
+      <span class="lbl" id="lb-count"></span>
+    </div>
+    <div class="chiprow" id="model-toggles"><span class="lbl">Chart models</span></div>
+    <p class="table-scroll-hint" aria-hidden="true">Leaderboard stacks on small screens, no sideways scroll</p>
+    <div class="table-wrap">
+      <table id="lb-table" aria-label="Model leaderboard">
+        <thead><tr>
+          <th class="sortable" data-key="model">Model <span class="arr"></span></th>
+          <th class="sortable num" data-key="precision">Precision <span class="arr"></span></th>
+          <th class="sortable num" data-key="recall">Recall <span class="arr"></span></th>
+          <th class="sortable num" data-key="f1">F1 <span class="arr"></span></th>
+          <th class="sortable num" data-key="accuracy">Accuracy <span class="arr"></span></th>
+          <th class="sortable num" data-key="latency">Avg latency <span class="arr"></span></th>
+          <th class="sortable num" data-key="cpf">Cost / finding <span class="arr"></span></th>
+          <th class="sortable num" data-key="total">Total <span class="arr"></span></th>
+          <th class="sortable num" data-key="unparsed">Unparsed <span class="arr"></span></th>
+        </tr></thead>
+        <tbody id="lb-body"></tbody>
+      </table>
+    </div>
+    <p class="table-note">Unavailable means the model could not be run at all on 2026-11-08, verified by a direct single chat call for each one. Their dashes are not zero scores and they cost $0. The 404 responses and the 400 deprecated response are permanent. The 503 responses may be transient and are worth retrying later. Honest misses are kept: GLM-5.3-Flash called F17, a JWT test with a mock key, real when it was expected false positive. DeepSeek-V4.1-Flash returned no verdict on F07, a path-traversal check that stays inside the base directory, even after a 2500-token re-run, recorded as unparsed: its TP 25, FP 0, TN 24, FN 0 sums to 49 parsed answers, accuracy 49/50 = 0.980, precision, recall and F1 on the 49 parsed only. Total actually spent in this pass: $0.696507. Grand total for the whole project: about $0.75. Budget cap $5.</p>
+
+    <div class="takeaway">
+      <h3>The short answer</h3>
+      <p><b>Best value is still Gemini 3.5 Flash Lite: perfect accuracy 1.000 for $0.006663 total.</b> Three models scored a perfect 1.000 accuracy: Gemini 3.5 Flash Lite, Qwen3.8-Flash and DeepSeek V4 Flash Vision Exp. The cheapest scored run of all was XiaomiMiMo/MiMo-V2.6-Flash at $0.002579 total, accuracy 0.960. The slowest scored model was DeepSeek-R1-0528 at 25.60s per finding, and the most expensive scored run was Qwen3.5-35B-A3B at $0.188493. 12 of the 34 attempted models never answered at all, they are listed as unavailable above with the exact HTTP error each one returned.</p>
+    </div>
+
+    <div class="dcard" style="margin-top:18px">
+      <h3 style="font-size:19px;font-weight:600;margin-bottom:6px">What running every model would cost</h3>
+      <p style="font-family:var(--mono);font-size:13px;color:#c9c9c9;line-height:1.8;margin:0 0 14px">Running all 80 priced unique models on 50 findings costs <b style="color:var(--lime)">$73.53</b> on the safe basis (250 prompt + 2500 completion tokens per finding, 4550 prompt for openai/gpt-6.1-sol) and <b style="color:var(--lime)">$8.38</b> on the realistic basis (156 prompt + 246 completion tokens per finding, the observed means). gmicloud/Ripple-65B-Preview has no pricing and cannot be estimated. All 81 unique models do NOT fit in the $5 cap. The safe cumulative cost of the 4 original models plus the 30 cheapest untested was $4.886, under $5. The next cheapest untested model, Qwen/Qwen3.5-27B at a safe $0.304, would have pushed it to $5.19, so it was not run.</p>
+      <p style="font-family:var(--mono);font-size:13px;color:#c9c9c9;line-height:1.8;margin:0">47 models remain untested. Remaining total: safe $68.64, realistic $7.84. Cheapest remaining, safe cost for 50 findings: Qwen/Qwen3.5-27B $0.304, tencent/hy4 $0.323, tencent/hy4-preview $0.323, nvidia/nemotron-3-ultra-550b-a55b $0.335, stepfun-ai/Step-5-Preview $0.350.</p>
+    </div>
+
+    <div style="height:44px"></div>
+    <div class="grid2">
+      <div class="dcard chart-panel">
+        <h3>Quality scores by model</h3>
+        <p class="sub">Precision, recall, F1 and accuracy for all 22 scored models. Scale runs from 0.70 to 1.00 so the gaps stay visible. Hover any bar for the exact value. Toggle models off above to focus.</p>
+        <div class="legend"><span><i class="dot-sq" style="background:var(--lime)"></i>Precision</span><span><i class="dot-sq" style="background:var(--lime-dark)"></i>Recall</span><span><i class="dot-sq" style="background:#8a8a8a"></i>F1</span><span><i class="dot-sq" style="background:#e8e8e8"></i>Accuracy</span></div>
+        <div id="chart-quality"></div>
+        <p class="axis-note">Seven models reached F1 0.980 or higher. The weakest precision was Gemini 3.1 Flash Lite Preview at 0.774, it called 7 false positives real. The weakest accuracy was 0.820, DeepSeek-V3-0324, with 5 unparsed answers.</p>
+      </div>
+      <div class="dcard chart-panel">
+        <h3>Cost vs accuracy tradeoff</h3>
+        <p class="sub">All 22 scored models: accuracy on the vertical axis, cost per finding on the horizontal axis, drawn on a log scale so the cheap models and the GPT-6.1 Sol smoke test fit on one chart. Top left is the sweet spot: perfect and cheap. Hover any point for exact values, F1 and latency included.</p>
+        <div class="scatter-wrap"><svg id="scatter" viewBox="0 0 560 430" width="100%" style="max-width:560px" role="img" aria-label="Scatter plot of accuracy against cost per finding for all 22 scored models, log scale"></svg></div>
+        <div class="scatter-legend" id="scatter-legend"></div>
+        <p class="axis-note">Three models sit at perfect accuracy: Gemini 3.5 Flash Lite, Qwen3.8-Flash and DeepSeek V4 Flash Vision Exp. Gemini is the best value of the three at $0.000133 per finding. The hollow diamond is openai/gpt-6.1-sol from a 5-finding smoke test only, not a full benchmark: perfect on those 5, at $0.009372 per finding, roughly 70 times the cost of Gemini per finding.</p>
+      </div>
+      <div class="dcard chart-panel">
+        <h3>Average latency per finding</h3>
+        <p class="sub">Seconds per finding, averaged over the run, all 22 scored models. Lower is faster. Hover for exact values.</p>
+        <div id="chart-latency"></div>
+      </div>
+      <div class="dcard chart-panel">
+        <h3>Cost per finding</h3>
+        <p class="sub">US dollars per finding, from token usage returned by the API and the live per-token prices, all 22 scored models. Lower is cheaper. Hover for exact values.</p>
+        <div id="chart-cost"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ---------- Live triage (dark contrast) ---------- */
+.keybox{border:1px solid var(--rule-dark);background:var(--media);padding:26px;margin-bottom:20px}
+.keybox h3{color:var(--offwhite);font-size:19px;margin-bottom:6px}
+.keybox .note{font-family:var(--mono);font-size:12.5px;color:#c9c9c2;line-height:1.75;margin:0 0 18px;max-width:860px}
+.keyrow{display:flex;gap:10px;flex-wrap:wrap}
+.keyrow input[type=password],.keyrow input[type=text]{flex:1 1 320px;background:#000;border:1px solid var(--rule-dark);color:#fff;font-family:var(--mono);font-size:14px;padding:12px 14px;border-radius:0;min-height:44px}
+.keyrow input:focus{outline:2px solid var(--lime);outline-offset:1px}
+.btn-ghost{background:transparent;color:var(--offwhite);border:1px solid var(--rule-dark)}
+.btn-ghost:hover{border-color:var(--lime2);color:var(--lime2)}
+.keystatus{font-family:var(--mono);font-size:13px;margin-top:14px;min-height:20px;line-height:1.6}
+.keystatus.ok{color:var(--lime2)}.keystatus.err{color:#fca5a5}.keystatus.dim{color:#a8a8a0}
+.triage-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+@media(max-width:960px){.triage-grid{grid-template-columns:1fr}}
+.tpanel{border:1px solid var(--rule-dark);background:#101010;padding:24px}
+.tpanel h3{color:var(--offwhite);font-size:17px;margin-bottom:12px}
+.tpanel label.flabel{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a8a8a0;margin:16px 0 7px}
+.tpanel label.flabel:first-of-type{margin-top:0}
+select,input[type=search],input[type=text].txt,textarea{font-family:var(--mono);font-size:13.5px;border-radius:0}
+.tpanel select,.tpanel textarea{width:100%;background:#000;border:1px solid var(--rule-dark);color:#f2f2ec;padding:11px 12px}
+.tpanel textarea{min-height:220px;resize:vertical;line-height:1.6;font-size:13px}
+.tpanel select:focus,.tpanel textarea:focus{outline:2px solid var(--lime);outline-offset:1px}
+.exrow{display:flex;gap:8px;flex-wrap:wrap}
+.exbtn{background:#000;border:1px solid var(--rule-dark);color:#e8e8e0;font-size:12px;padding:9px 12px;letter-spacing:.04em;text-transform:none;transition:all .2s;text-align:left}
+.exbtn:hover{border-color:var(--lime2);color:var(--lime2);transform:translateY(-2px)}
+.exbtn:active{transform:scale(.97)}
+.pricebox{font-family:var(--mono);font-size:12.5px;color:#d8d8d0;background:#000;border:1px solid var(--rule-dark);padding:13px 14px;line-height:1.9;margin-top:14px}
+.pricebox b{color:var(--lime2)}
+.capwarn{display:none;margin-top:12px;border:1px solid var(--amber);background:#2a1e05;color:#fcd9a0;font-family:var(--mono);font-size:12.5px;padding:11px 13px;line-height:1.65}
+.progress{height:8px;background:#262626;margin-top:16px;display:none;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--lime2);width:0%;transition:width .4s ease}
+.progress.indet i{width:40%;animation:slide 1.1s ease-in-out infinite alternate}
+@keyframes slide{from{transform:translateX(-60%)}to{transform:translateX(260%)}}
+.verdict-out{margin-top:18px}
+.vstep{opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease;margin-bottom:12px}
+.vstep.show{opacity:1;transform:none}
+.vbadge{display:inline-block;font-family:var(--mono);font-weight:600;font-size:19px;letter-spacing:.06em;padding:12px 20px;text-transform:uppercase}
+.vbadge.real{background:var(--red);color:#fff}
+.vbadge.fp{background:var(--lime2);color:#000}
+.vmeta{font-family:var(--mono);font-size:13px;color:#d8d8d0;line-height:1.9}
+.vmeta b{color:#fff}
+.vtext{font-size:14.5px;color:#efefe8;line-height:1.7}
+.vtext .vl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a8a8a0;display:block;margin-bottom:3px}
+.errbox{display:none;border:1px solid var(--red);background:#2a0808;color:#fecaca;font-family:var(--mono);font-size:13px;padding:14px 16px;line-height:1.7;margin-top:16px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #555;border-top-color:var(--lime2);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.benchrun{margin-top:20px;border-top:1px solid var(--rule-dark);padding-top:20px}
+.small-note{font-family:var(--mono);font-size:12px;color:#a8a8a0;line-height:1.7;margin-top:10px}
+
+/* ---------- Models / dataset (light) ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;align-items:end}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);font-weight:600}
+.field select,.field input{background:#fff;border:1px solid #cfcfcf;color:var(--ink);padding:10px 12px;min-height:42px;min-width:170px}
+.field input{min-width:230px}
+.field select:focus,.field input:focus{outline:2px solid var(--lime-dark);outline-offset:1px}
+.result-count{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--ink2);padding-bottom:11px}
+.result-count b{color:#000;background:var(--lime);padding:1px 7px}
+.model-row td .ctx{color:var(--ink2);font-family:var(--mono);font-size:12px}
+.rec-picks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.rec-pick{border:1px solid #000;background:#fff;color:#000;font-size:12.5px;padding:11px 15px;letter-spacing:.06em;text-transform:uppercase;transition:all .2s}
+.rec-pick:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.rec-pick:active{transform:scale(.97)}
+.rec-pick.active{background:var(--lime);border-color:#000}
+.rec-out h3{font-family:var(--mono);font-size:16px;overflow-wrap:anywhere}
+.rec-out p{font-size:14.5px;color:#2b2b2b;line-height:1.7}
+.rec-out .est{font-family:var(--mono);font-size:13px;background:var(--lime-pale);border:1px solid #c9cfa3;padding:12px 14px;line-height:1.8}
+select.modelpick{width:100%;background:#fff;border:1px solid #cfcfcf;color:var(--ink);padding:11px 12px;min-height:44px}
+select.modelpick:focus{outline:2px solid var(--lime-dark);outline-offset:1px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,80px);background:#000;color:var(--lime);font-family:var(--mono);font-size:13px;padding:12px 20px;z-index:300;transition:transform .35s ease;border:1px solid var(--lime);box-shadow:0 14px 34px rgba(0,0,0,.3)}
+.toast.show{transform:translate(-50%,0)}
+.faq{background:#0b0b0b;color:#eee;padding:88px 0}
+.faq details{border-top:1px solid #333;padding:20px 0}
+.faq details:last-of-type{border-bottom:1px solid #333}
+.faq summary{font-family:var(--sans);font-size:19px;font-weight:550;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--lime);font-family:var(--mono)}
+.faq details[open ] summary::after{content:"-"}
+.faq details p{font-family:var(--mono);font-size:13.5px;color:#c4c4c4;line-height:1.8;max-width:860px}
+.cta-lime{background:var(--lime);color:#000;padding:84px 0}
+.cta-lime h2{font-size:clamp(32px,4vw,54px);font-weight:550;line-height:1.12;max-width:820px}
+.cta-lime p{font-family:var(--mono);font-size:14.5px;margin:16px 0 30px;max-width:700px;line-height:1.75}
+footer{background:#000;color:#c9c9c9;padding:56px 0 40px}
+footer .fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px}
+@media(max-width:760px){footer .fgrid{grid-template-columns:1fr}}
+footer h4{color:#fff;font-family:var(--sans);font-size:16px;margin:0 0 12px}
+footer p,footer li{font-family:var(--mono);font-size:12.5px;line-height:1.8;color:#b5b5b5}
+footer ul{list-style:none;margin:0;padding:0}
+footer a{color:#b5b5b5;text-decoration:none}
+footer a:hover{color:var(--lime)}
+.method-list{margin:0;padding-left:18px;font-size:14.5px;color:#2b2b2b}
+.method-list li{margin-bottom:9px;line-height:1.65}
+.callout{border:1px solid var(--amber);background:#fffdf6;padding:22px 24px;margin-top:18px}
+.callout h3{color:#92580a;font-size:16px;margin-bottom:6px}
+.callout p{margin:0;font-size:14.5px;color:#4a3a10;line-height:1.7}
+code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid var(--line-light);padding:1px 6px;color:#000}
+.codeblock{background:#000;color:#e8f0c8;border:1px solid #000;padding:20px 22px;font-family:var(--mono);font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+.codeblock .c{color:#8f8f8f}.codeblock .p{color:var(--lime)}
+.verdict-cell{text-align:center}th.verdict-cell{text-align:center}
+.finding-code{font-family:var(--mono);font-size:11.5px;color:var(--ink2);white-space:pre-wrap;word-break:break-word;max-width:340px;line-height:1.55}
+.label-note{font-family:var(--mono);font-size:11.5px;color:#7a5410;background:#fffdf6;border:1px solid var(--amber);padding:9px 11px;margin-top:9px;line-height:1.65;max-width:340px;text-align:left}
+.label-note b{color:#92580a}
+@media(max-width:760px){
+  .dataset-table thead{display:none}
+  .dataset-table,.dataset-table tbody,.dataset-table tr,.dataset-table td{display:block;width:100%;min-width:0}
+  .dataset-table tr{border-bottom:1px solid var(--line-light);padding:10px 4px}
+  .dataset-table td{border:none !important;padding:5px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;text-align:right}
+  .dataset-table td::before{content:attr(data-label);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:600;text-align:left;padding-top:3px}
+  .dataset-table td .finding-code{text-align:left}
+  .dataset-table{min-width:0}
+  .hbar{grid-template-columns:100px 1fr 80px}
+}
+.table-scroll-hint{display:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+@media(max-width:760px){
+  .table-scroll-hint{display:block}
+  #lb-table thead{display:none}
+  #lb-table,#lb-table tbody,#lb-table tr,#lb-table td{display:block;width:100%;min-width:0}
+  #lb-table{min-width:0}
+  #lb-table tr{border-bottom:1px solid #242424;padding:10px 4px}
+  #lb-table td{border:none !important;padding:5px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;text-align:right}
+  #lb-table td::before{content:attr(data-label);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a8a8a8;font-weight:600;text-align:left;padding-top:3px;white-space:nowrap}
+  #lb-table td.model-cell{display:block;text-align:left}
+  #lb-table td.model-cell::before{display:block;margin-bottom:4px}
+  .table-wrap{overflow-x:visible}
+  .dataset-table{min-width:0}
+  table{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+.tabpanel[hidden]{display:none}
+</style>
+
+<!-- ================= LIVE TRIAGE ================= -->
+<section class="sec-dark tabpanel" id="triage" data-panel="triage" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="dot">&#9679;</span> Live Triage</p>
+      <h2>Triage your own code, live</h2>
+      <p>Paste real code, a semgrep or osv-scanner finding, or a CVE description. Pick any of the 82 verified GMI models. The verdict comes straight from the GMI Inference API, called from your browser with your key.</p>
+    </div>
+
+    <div class="keybox">
+      <h3>Your GMI API key</h3>
+      <p class="note">your key stays in your browser, it is never sent to our server, it is only used to call https://api.gmi-serving.com/v1 directly from your browser, you can clear it anytime. It is stored in sessionStorage only for this tab session, never in localStorage, and it is cleared when you close the tab or press Clear key. If Test Key reports a network error while you are in an in-app browser or webview, open this page in Chrome or Safari and try again, the API's Cloudflare layer can reject webviews before the call arrives.</p>
+      <div class="keyrow">
+        <input type="password" id="api-key" placeholder="Paste your GMI API key" autocomplete="off" spellcheck="false" aria-label="GMI API key">
+        <button class="btn btn-ghost" id="key-toggle" type="button">Show</button>
+        <button class="btn btn-ghost" id="key-test" type="button">Test Key</button>
+        <button class="btn btn-ghost" id="key-clear" type="button">Clear Key</button>
+      </div>
+      <div class="keystatus dim" id="key-status">No key entered yet. Add your key to enable live triage.</div>
+    </div>
+
+    <div class="triage-grid">
+      <div class="tpanel">
+        <h3>Finding to triage</h3>
+        <label class="flabel" for="triage-model">Model</label>
+        <select id="triage-model" aria-label="Model for live triage"></select>
+        <div class="pricebox" id="triage-price"></div>
+        <label class="flabel">Load an example</label>
+        <div class="exrow">
+          <button class="exbtn" type="button" data-ex="sqli">1 &middot; SQL injection, string concatenation</button>
+          <button class="exbtn" type="button" data-ex="jwt">2 &middot; JWT verify_signature disabled</button>
+          <button class="exbtn" type="button" data-ex="fp">3 &middot; False positive, parameterised query</button>
+        </div>
+        <label class="flabel" for="triage-input">Code, finding or CVE description</label>
+        <textarea id="triage-input" placeholder="Paste a code snippet, a semgrep or osv finding, or a CVE description here..." spellcheck="false"></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn btn-lime" id="triage-run" type="button" disabled>Triage This Finding &#8599;</button>
+          <button class="btn btn-ghost" id="triage-copycode" type="button">Copy Code</button>
+        </div>
+        <p class="small-note" id="triage-nokey">Add your GMI API key above first, then this button unlocks. Nothing is sent anywhere until you press it.</p>
+        <div class="progress" id="triage-progress"><i></i></div>
+      </div>
+
+      <div class="tpanel">
+        <h3>Verdict</h3>
+        <div id="verdict-empty" class="vmeta">No verdict yet. Run a triage and the model's answer appears here: verdict, severity, confidence, reason and suggested fix, plus latency and token usage returned by the API.</div>
+        <div class="verdict-out" id="verdict-out" style="display:none">
+          <div class="vstep" id="vs-badge"></div>
+          <div class="vstep" id="vs-meta"></div>
+          <div class="vstep" id="vs-reason"></div>
+          <div class="vstep" id="vs-fix"></div>
+          <div class="vstep" id="vs-actions" style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-lime" id="copy-verdict" type="button">Copy Verdict</button>
+            <button class="btn btn-ghost" id="export-verdict" type="button">Export JSON</button>
+          </div>
+        </div>
+        <div class="errbox" id="triage-error"></div>
+
+        <div class="benchrun">
+          <h3>Run the full benchmark yourself</h3>
+          <p class="small-note" style="margin-top:0">Runs all 50 dataset v1 findings against the model selected above, one call at a time, using your key. The estimate is a safe upper bound: this model's real per-token prices at 250 prompt tokens (4550 for openai/gpt-6.1-sol, the observed count) + 2500 completion tokens per finding. Completion is priced at max_tokens (2500), so the token count cannot exceed this basis. For reference, DeepSeek F07 actually used 2500 completion tokens and cost $0.00305. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Total project budget cap: $5. Nothing runs until you press Run.</p>
+          <div class="pricebox" id="bench-est"></div>
+          <div class="capwarn" id="bench-capwarn">This estimate is at or over the $5 cap. Pick a cheaper model, or run it knowing your own GMI account will be charged roughly this amount.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+            <button class="btn btn-lime" id="bench-run" type="button" disabled>Run 50-Finding Benchmark</button>
+            <button class="btn btn-ghost" id="bench-stop" type="button" style="display:none">Stop</button>
+          </div>
+          <div class="progress" id="bench-progress"><i></i></div>
+          <div class="vmeta" id="bench-status" style="margin-top:12px"></div>
+          <div id="bench-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODELS ================= -->
+<section class="sec-white tabpanel" id="models" data-panel="models" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="dot">&#9679;</span> Models</p>
+      <h2>All 82 models, one recommender</h2>
+      <p>Every model below comes from the live list-models call verified on 2026-11-08, with its real per-token prices and context length. 22 models have measured scores from the 50-finding run, 12 attempted models were unavailable, and 1 more passed a smoke test. Everything else is labelled UNTESTED, with no invented scores. The docs example model meta-llama/Llama-3.3-70B-Instruct is not in the live list and is not offered here.</p>
+    </div>
+
+    <div class="grid2">
+      <div class="wcard">
+        <h3 style="font-size:19px;margin-bottom:6px">Model selector</h3>
+        <p style="font-family:var(--mono);font-size:12.5px;color:var(--ink2);margin:0 0 14px;line-height:1.7">Search all 82 models. Prices and estimates update instantly as you change the selection.</p>
+        <div class="field" style="margin-bottom:12px"><label for="model-search">Search models</label><input type="search" id="model-search" placeholder="Try qwen, gpt, deepseek, coder..." autocomplete="off"></div>
+        <select class="modelpick" id="model-pick" size="8" aria-label="All 82 GMI models"></select>
+        <p class="table-note" id="model-count"></p>
+        <div class="pricebox" id="model-price" style="background:#fbfbf5;border-color:var(--line-light);color:var(--ink)"></div>
+        <div class="capwarn" id="model-capwarn">The estimated 50-finding cost for this model is high. The original project cap was $5 total, so check the estimate before running anything.</div>
+        <div class="capwarn" style="display:block">Safe upper-bound estimates: every estimate on this page prices completion at max_tokens (2500 tokens per finding) plus 250 prompt tokens (4550 for openai/gpt-6.1-sol, observed), so token counts cannot exceed the estimate. Safe upper bounds for 50 findings, verified 2026-11-08: GLM-5.3-Flash $0.064, DeepSeek-V4.1-Flash $0.154, Qwen3.8-Flash $0.061, Gemini 3.5 Flash Lite $0.316, GPT-6.1 Sol $1.705. All five together $2.30, under the $5 cap.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          <button class="btn btn-dark" id="model-use-triage" type="button">Use in Live Triage</button>
+          <button class="btn btn-outline-dark" id="model-export" type="button">Export Model List JSON</button>
+        </div>
+      </div>
+
+      <div class="wcard rec-out">
+        <h3 style="font-size:19px;margin-bottom:6px">Recommender</h3>
+        <p style="font-family:var(--mono);font-size:12.5px;color:var(--ink2);margin:0 0 14px;line-height:1.7">Pick a priority. The recommendation updates instantly, using verified benchmark results for tested models and real pricing for untested ones.</p>
+        <div class="rec-picks" id="rec-picks">
+          <button class="rec-pick active" data-pri="accuracy">Highest accuracy</button>
+          <button class="rec-pick" data-pri="fastest">Fastest</button>
+          <button class="rec-pick" data-pri="cheapest">Cheapest</button>
+          <button class="rec-pick" data-pri="value">Best value</button>
+          <button class="rec-pick" data-pri="coding">Best for coding &amp; security triage</button>
+          <button class="rec-pick" data-pri="strongest">Strongest overall</button>
+        </div>
+        <div id="rec-out"></div>
+      </div>
+    </div>
+
+    <div style="height:44px"></div>
+    <div class="sec-head" style="margin-bottom:22px"><h2 style="font-size:30px">Strengths and weaknesses</h2></div>
+    <div class="grid2" id="model-cards"></div>
+
+    <div class="smoke" role="note">
+      <div>
+        <h3>Strong-model smoke test: openai/gpt-6.1-sol</h3>
+        <p>Verified 2026-11-08 on 5 findings only. This is a 5-finding smoke test, NOT a full 50-finding benchmark, and it is not ranked on the leaderboard.</p>
+        <p>Prompt-size investigation, 2026-11-08: the runner sends the same roughly 150-token prompt to every model, with no Sol-specific content, and no runner bug was found. Sol rows report about 3801 cached_tokens per row, about 84 percent of prompt tokens, so the extra prompt tokens (about 4510 vs about 150) are provider-side and cached, not a runner bug. The cost of $0.009372 per finding is correct for those tokens. No full 50-finding Sol run has been run. The safe upper-bound estimate for Sol on this page uses the observed 4550 prompt tokens per finding.</p>
+      </div>
+      <div class="nums">
+        <span>Precision<b>1.000</b></span><span>Recall<b>1.000</b></span><span>Accuracy<b>1.000</b></span><span>Avg latency<b>4.19s</b></span><span>Cost / finding<b>$0.009372</b></span><span>Total (5)<b>$0.046858</b></span>
+      </div>
+    </div>
+
+    <div style="height:30px"></div>
+    <div class="miss-grid grid2">
+      <div class="miss"><h3>Miss 1 &middot; <span class="mono">F17</span> &middot; GLM called a safe case real</h3><p>Category jwt, severity low, expected false positive. The snippet is a JWT test that uses a mock key, 'test-secret', and is labelled false positive because it is test code. GLM-5.3-Flash returned a verdict of real. The other three models returned false positive. This label is contestable: a production reviewer could reasonably call it real, as GLM did.</p><p>Effect: GLM precision 0.962, F1 0.980, accuracy 0.980. The only false positive verdict in the entire 200-call run.</p></div>
+      <div class="miss"><h3>Miss 2 &middot; <span class="mono">F07</span> &middot; DeepSeek returned no verdict</h3><p>Category path-traversal, severity low, expected false positive. The check stays inside the base directory, so there is no traversal. DeepSeek-V4.1-Flash returned no verdict at all, even after a 2500-token re-run, because reasoning tokens filled the whole budget.</p><p>Effect: recorded as unparsed, Unparsed: 1. DeepSeek TP 25, FP 0, TN 24, FN 0 sums to 49 parsed answers, so accuracy is 49/50 = 0.980, and precision, recall and F1 are calculated on the 49 parsed answers only.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DATASET ================= -->
+<section class="sec-grey tabpanel" id="dataset" data-panel="dataset" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="dot">&#9679;</span> Dataset</p>
+      <h2>All 50 findings, every verdict</h2>
+      <p>Verdict matrix for the 4 original models. R means the model called it real, FP means it called it a false positive. Search and filters update as you type. The two misses, F07 and F17, are highlighted. Scores for all 22 scored models are on the leaderboard.</p>
+    </div>
+    <div class="filters">
+      <div class="field"><label for="f-search">Search</label><input id="f-search" type="search" placeholder="Try F07, jwt, SQL..." autocomplete="off"></div>
+      <div class="field"><label for="f-cat">Category</label><select id="f-cat"><option value="">All categories</option></select></div>
+      <div class="field"><label for="f-label">Expected label</label><select id="f-label"><option value="">All labels</option><option value="real">Real</option><option value="false_positive">False positive</option></select></div>
+      <div class="field"><label for="f-correct">Correctness</label><select id="f-correct"><option value="">All findings</option><option value="correct">All models correct</option><option value="miss">Any miss</option></select></div>
+      <div style="padding-bottom:2px"><button class="btn btn-dark" id="ds-export" type="button">Export Results JSON</button></div>
+      <div class="result-count" id="result-count"></div>
+    </div>
+    <div class="table-wrap light">
+      <table class="dataset-table" aria-label="Per finding model verdicts" style="min-width:0">
+        <thead><tr><th>ID</th><th>Finding</th><th>Severity</th><th>Expected</th><th class="verdict-cell">GLM-5.3</th><th class="verdict-cell">DeepSeek-V4.1</th><th class="verdict-cell">Qwen3.8</th><th class="verdict-cell">Gemini Lite</th></tr></thead>
+        <tbody id="ds-body"></tbody>
+      </table>
+    </div>
+    <p class="table-note" id="ds-empty" style="display:none">No findings match those filters. Clear the search or pick a different category.</p>
+    <p class="table-note">48 of the 50 findings were judged correctly by all four models. Pick "Any miss" under Correctness to isolate F07 and F17.</p>
+    <div style="height:44px"></div>
+    <div class="sec-head" style="margin-bottom:22px">
+      <p class="eyebrow"><span class="dot">&#9679;</span> Dataset v2, balanced, not run</p>
+      <h2 style="font-size:30px">Balanced dataset v2: 56 findings, not run</h2>
+      <p>dataset-v2.json is a separate, balanced revision: 56 findings, 14 categories x 4 each, 28 real and 28 false positives. It adds 6 findings to v1 so path-traversal, csrf and open-redirect each reach 4: S26 Zip Slip (real), F26 zip path check (false positive), S27 CSRF password change (real), F27 CSRF token verified (false positive), S28 open redirect (real), F28 allowlisted redirect (false positive). <b>v2 has NOT been run. No v2 results exist. Do not treat v1 results as v2 results.</b> The v1 results above stay exactly as verified. Safe upper-bound cost to run v2 on the 4 original models: $0.67 total (250 prompt + 2500 completion tokens per finding).</p>
+    </div>
+    <div class="table-wrap light">
+      <table class="dataset-table" aria-label="Dataset v2 added findings" style="min-width:0">
+        <thead><tr><th>ID</th><th>Finding</th><th>Category</th><th>Severity</th><th>Expected</th></tr></thead>
+        <tbody id="ds2-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px"><button class="btn btn-dark" id="ds2-export" type="button">Export dataset-v2.json</button></div>
+    <p class="table-note">v2 status: NOT RUN. There are no v2 scores, verdicts or costs beyond the $0.67 safe upper-bound estimate for the 4 original models.</p>
+
+  </div>
+</section>
+
+<!-- ================= METHODOLOGY ================= -->
+<section class="sec-white" id="methodology">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="dot">&#9679;</span> Methodology</p>
+      <h2>How the benchmark was run</h2>
+      <p>So anyone can check the setup before trusting the scores, and reproduce the run.</p>
+    </div>
+    <div class="grid2">
+      <div class="wcard"><h3 style="font-size:18px;margin-bottom:12px">Dataset and prompt</h3><ul class="method-list">
+        <li>Fixed dataset of 50 generic, public-style code snippets. 25 real vulnerabilities, 25 false positives. No private findings were used.</li>
+        <li>The categories are NOT balanced. 11 categories have 4 findings each: sql-injection, xss, ssrf, command-injection, hardcoded-secret, weak-crypto, insecure-deserialization, jwt, auth-bypass, idor, and sensitive-data. Three categories have 2 findings each: path-traversal, CSRF, and open-redirect. 11 x 4 + 3 x 2 = 50 findings in total.</li>
+        <li>Balanced v2 dataset: dataset-v2.json holds 56 findings, 14 categories x 4 each, 28 real and 28 false positives, adding S26, F26, S27, F27, S28 and F28 to balance path-traversal, csrf and open-redirect. v2 has NOT been run, no v2 results exist, and v1 results must not be treated as v2 results. Safe upper-bound cost to run v2 on the 4 original models is $0.67 total.</li>
+        <li>One label is contestable: F17, a JWT test that uses the mock secret 'test-secret', is labelled false positive because it is test code. A production reviewer could reasonably call it real, and GLM-5.3-Flash did. See the note on F17 in the Dataset viewer.</li>
+        <li>A finding counts as real only if untrusted input actually reaches a dangerous sink with no effective mitigation in the code shown.</li>
+        <li>The same prompt was used for every model. Each model had to return ONLY JSON, with a verdict of real or false_positive, plus severity and a reason.</li>
+        <li>Settings were identical for all models: temperature 0. The first pass used max_tokens 1000, the targeted re-run used 2500.</li>
+      </ul></div>
+      <div class="wcard"><h3 style="font-size:18px;margin-bottom:12px">Scoring and cost</h3><ul class="method-list">
+        <li>34 models were attempted in the full pass on 2026-11-08: 22 scored, which is 1,100 model calls across the 50 findings, and 12 unavailable, each verified by a direct single chat call and recorded with its HTTP error at $0 cost.</li>
+        <li>In the original 4-model run, five answers came back unparsed in the first pass. A re-run at 2500 tokens parsed 4 of the 5. Only F07 on DeepSeek stayed unparsed.</li>
+        <li>This pass actually cost $0.696507. The grand total for the whole project is about $0.75, still well under the $5 cap. Running all 80 priced models would cost a safe $73.53, so 47 models remain untested: the safe cumulative cost stopped at $4.886 because the next model, Qwen/Qwen3.5-27B at a safe $0.304, would have pushed it to $5.19.</li>
+        <li>DeepSeek denominator, stated explicitly: DeepSeek has 1 unparsed finding, F07. Its counts are TP 25, FP 0, TN 24, FN 0, which sum to 49 parsed answers. Its accuracy is 49/50 = 0.980, and its precision, recall and F1 are calculated on the 49 parsed answers only. The other three models have Unparsed: 0.</li>
+        <li>Cost was calculated from the token usage returned by the API and the per-token prices in the live models list, not from estimates.</li>
+        <li>Cost estimates on this page use a safe upper bound: 250 prompt tokens per finding (4550 for openai/gpt-6.1-sol, the observed provider-side count) plus 2500 completion tokens per finding. Completion is priced at max_tokens (2500), so a call's token count cannot exceed this basis. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Actual spend is usually far lower: the verified 50-finding run cost $0.051781 in total. DeepSeek F07 shows why the bound matters: it used the full 2500 completion tokens and cost $0.00305 for one finding.</li>
+        <li>Models were verified live on 2026-11-08 against a fresh list-models call, 82 models in total. The original 4-model run plus re-run cost $0.051781. The full 34-model pass cost $0.696507, and the grand total for the whole project is about $0.75, under the $5 cap.</li>
+      </ul></div>
+    </div>
+    <div class="callout"><h3>Honest limitation</h3><p>The dataset is deliberately clear-cut, so perfect scores mean these models handle clear-cut cases well. They do not prove the same score on subtle, real-world code, where the line between a real vulnerability and a false positive is much harder to draw. That is exactly what the Live Triage tab is for: test the models on your own code.</p></div>
+    <div style="height:22px"></div>
+    <div class="codeblock"><span class="c"># Smoke test, first 5 findings</span>
+<span class="p">$</span> python3 run_benchmark.py --limit 5
+
+<span class="c"># Full benchmark, all 50 findings across 4 models</span>
+<span class="p">$</span> python3 run_benchmark.py
+
+<span class="c"># Endpoint used by the runner and by Live Triage on this page</span>
+https://api.gmi-serving.com/v1/chat/completions</div>
+  </div>
+</section>
+
+<div class="faq">
+  <div class="wrap">
+    <p class="eyebrow"><span class="dot">&#9679;</span> Questions</p>
+    <h2 style="font-size:clamp(30px,3.4vw,46px);font-weight:550;margin-bottom:26px">Before you run anything</h2>
+    <details><summary>Is my API key safe on this page?</summary><p>Your key stays in your browser. It is kept in sessionStorage for this tab only, never in localStorage, never logged, and the only request it is ever attached to goes directly from your browser to https://api.gmi-serving.com/v1. Press Clear key, or close the tab, and it is gone. Test Key calls GET /v1/models only, it does not run a chat call and costs nothing.</p></details>
+    <details><summary>How many models were run, and why not all 81?</summary><p>34 models were attempted on 2026-11-08: 22 scored on all 50 findings for $0.696507 in this pass, and 12 were unavailable, each verified by a direct single chat call and shown with its HTTP error at $0 cost. Running all 80 priced unique models would cost a safe $73.53 (realistic $8.38), and gmicloud/Ripple-65B-Preview has no pricing, so all 81 do not fit in the $5 cap. 47 models remain untested and are listed with real prices, marked UNTESTED rather than given invented scores. You can run any of them yourself from the Live Triage tab.</p></details>
+    <details><summary>What does it cost to run the benchmark myself?</summary><p>The Models tab and the Live Triage tab show a live safe upper-bound estimate for the selected model, for 1, 5 and 50 findings, from its real per-token prices. The basis is 250 prompt tokens (4550 for openai/gpt-6.1-sol, observed) plus 2500 completion tokens per finding, with completion priced at max_tokens, so token counts cannot exceed it. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Actual costs are usually far lower, and the page warns you before you run an expensive model.</p></details>
+    <details><summary>Does a perfect score mean a model is safe to trust?</summary><p>No. The dataset is deliberately clear-cut. Read the honest limitation in Methodology, then test the model on your own real findings in Live Triage before relying on it.</p></details>
+    <details><summary>Test Key says "Network error". What is wrong?</summary><p>The API itself is reachable and CORS-open, and it answers a bad key with an "Invalid API key (401)" message, so a network error is not your key. It means the browser was stopped before any answer came back. The GMI API sits behind Cloudflare, which can reject in-app browsers and webviews by their browser signature, and a VPN, a content blocker, or a dropped mobile connection causes the same failure. Test Key and Live Triage retry once automatically and time out cleanly instead of spinning. If it still fails, open this page in a full browser (Chrome or Safari, not an in-app viewer), turn off any VPN or blocker, and try again.</p></details>
+  </div>
+</div>
+
+<div class="cta-lime">
+  <div class="wrap">
+    <h2>Triage your next finding with a model you picked yourself.</h2>
+    <p>Add your GMI key, choose from all 82 models, and get a verdict with severity, confidence and a suggested fix.</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a class="btn btn-dark btn-lg" href="#triage">Run Live Triage &#8599;</a>
+      <a class="btn btn-outline-dark btn-lg" href="#dataset">Browse the Dataset</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><h4>Security Model Benchmark</h4><p>Run on 2026-11-08 &middot; GMI Cloud Inference Engine &middot; 50 findings &middot; 34 models attempted, 22 scored, 12 unavailable &middot; 82 models verified live. This pass $0.696507, grand total about $0.75, budget cap $5.</p></div>
+      <div><h4>Sections</h4><ul><li><a href="#benchmark">Benchmark</a></li><li><a href="#triage">Live Triage</a></li><li><a href="#models">Models</a></li><li><a href="#dataset">Dataset</a></li></ul></div>
+      <div><h4>Notes</h4><p>Mobile layout uses standard responsive stacking and was not separately verified against the live GMI site. Untested models carry no scores on this page, only real prices.</p></div>
+    </div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var ALL_MODELS = [{"id": "deepseek-ai/deepseek-v4.1-flash-1017", "ctx": 1048575, "p": "0.000000300", "c": "0.000001200"}, {"id": "google/gemini-3.8-flash", "ctx": 1048576, "p": "0.000000750", "c": "0.000003750"}, {"id": "zai-org/GLM-5.3-Flash", "ctx": 1048576, "p": "0.000000150", "c": "0.000000500"}, {"id": "Qwen/Qwen3.8-27B", "ctx": 1048575, "p": "0.000000450", "c": "0.000003200"}, {"id": "stepfun-ai/Step-3.7-Flash", "ctx": 256000, "p": "0.000000200", "c": "0.000001150"}, {"id": "google/gemini-3.7-flash", "ctx": 1048576, "p": "0.000000750", "c": "0.000003750"}, {"id": "Qwen/Qwen3.8-Max", "ctx": 262144, "p": "0.000002000", "c": "0.000006000"}, {"id": "deepseek-ai/DeepSeek-V4-Flash-0731", "ctx": 1048575, "p": "0.000000440", "c": "0.000001320"}, {"id": "google/gemini-3.6-flash", "ctx": 1048576, "p": "0.000001500", "c": "0.000007500"}, {"id": "google/gemini-3.5-flash-lite", "ctx": 1048576, "p": "0.000000300", "c": "0.000002500"}, {"id": "moonshotai/kimi-k3", "ctx": 1048576, "p": "0.000003000", "c": "0.000015000"}, {"id": "x-ai/grok-4.5", "ctx": 2000000, "p": "0.000002000", "c": "0.000006000"}, {"id": "openai/gpt-5.6-luna", "ctx": 1050000, "p": "0.000001000", "c": "0.000006000"}, {"id": "openai/gpt-5.6-terra", "ctx": 1050000, "p": "0.000002500", "c": "0.000015000"}, {"id": "openai/gpt-5.6-sol", "ctx": 1050000, "p": "0.000005000", "c": "0.000030000"}, {"id": "tencent/Hy3", "ctx": 262144, "p": "0.000000140", "c": "0.000000580"}, {"id": "moonshotai/kimi-k2.7-code-highspeed", "ctx": 262144, "p": "0.000001900", "c": "0.000008000"}, {"id": "zai-org/GLM-5.2-FP8", "ctx": 1048576, "p": "0.000001400", "c": "0.000004400"}, {"id": "MiniMaxAI/MiniMax-M3", "ctx": 1048576, "p": "0.000000300", "c": "0.000001200"}, {"id": "Qwen/Qwen3.7-Max", "ctx": 262144, "p": "0.000002500", "c": "0.000007500"}, {"id": "google/gemini-3.5-flash", "ctx": 1048576, "p": "0.000001500", "c": "0.000009000"}, {"id": "openai/gpt-5.5", "ctx": 1050000, "p": "0.000005000", "c": "0.000030000"}, {"id": "deepseek-ai/DeepSeek-V4-Pro", "ctx": 1048576, "p": "0.000001740", "c": "0.000003480"}, {"id": "zai-org/GLM-5.1-FP8", "ctx": 202752, "p": "0.000001400", "c": "0.000004400"}, {"id": "zai-org/GLM-5-FP8", "ctx": 202752, "p": "0.000001000", "c": "0.000003200"}, {"id": "openai/gpt-5.4-nano", "ctx": 409600, "p": "0.000000200", "c": "0.000001250"}, {"id": "openai/gpt-5.4-mini", "ctx": 409600, "p": "0.000000750", "c": "0.000004500"}, {"id": "MiniMaxAI/MiniMax-M2.7", "ctx": 196608, "p": "0.000000300", "c": "0.000001200"}, {"id": "google/gemini-3.1-flash-lite-preview", "ctx": 1048576, "p": "0.000000250", "c": "0.000001500"}, {"id": "openai/gpt-5.4-pro", "ctx": 409600, "p": "0.000030000", "c": "0.000180000"}, {"id": "openai/gpt-5.4", "ctx": 409600, "p": "0.000002500", "c": "0.000015000"}, {"id": "google/gemini-3.1-pro-preview", "ctx": 1048576, "p": "0.000002000", "c": "0.000012000"}, {"id": "deepseek-ai/DeepSeek-R1-0528", "ctx": 131072, "p": "0.000000570", "c": "0.000002290"}, {"id": "deepseek-ai/DeepSeek-V3.2", "ctx": 163840, "p": "0.000000290", "c": "0.000000430"}, {"id": "deepseek-ai/DeepSeek-V3-0324", "ctx": 128000, "p": "0.000000290", "c": "0.000001140"}, {"id": "deepseek-ai/DeepSeek-V4.1-Flash", "ctx": 1048575, "p": "0.000000300", "c": "0.000001200"}, {"id": "deepseek-ai/DeepSeek-V4-Flash", "ctx": 1048575, "p": "0.000000140", "c": "0.000000280"}, {"id": "deepseek-ai/deepseek-v4-flash-vision-exp", "ctx": 1048575, "p": "0.000000440", "c": "0.000001320"}, {"id": "deepseek-ai/DeepSeek-V4-Pro-0813", "ctx": 1048575, "p": "0.000001320", "c": "0.000003960"}, {"id": "google/gemini-3-flash-preview", "ctx": 1048576, "p": "0.000000500", "c": "0.000003000"}, {"id": "google/gemini-4-argon", "ctx": 1048576, "p": "0.000002000", "c": "0.000010000"}, {"id": "google/gemma-4-26b-a4b-it", "ctx": 256000, "p": "0.000000130", "c": "0.000000400"}, {"id": "google/gemma-4-31b-it", "ctx": 262144, "p": "0.000000140", "c": "0.000000400"}, {"id": "openai/gpt-6.1-sol", "ctx": 1050000, "p": "0.000002000", "c": "0.000010000"}, {"id": "openai/gpt-6-astra", "ctx": 1050000, "p": "0.000010000", "c": "0.000050000"}, {"id": "openai/gpt-6-luna", "ctx": 1050000, "p": "0.000000100", "c": "0.000000500"}, {"id": "openai/gpt-6-sol", "ctx": 1050000, "p": "0.000002000", "c": "0.000010000"}, {"id": "xai/grok4.6", "ctx": 2000000, "p": "0.000002000", "c": "0.000006000"}, {"id": "inclusionAI/Ling-3.0-flash-fin", "ctx": 262144, "p": "0.000000060", "c": "0.000000180"}, {"id": "XiaomiMiMo/MiMo-V2.6-Flash", "ctx": 1050000, "p": "0.000000140", "c": "0.000000280"}, {"id": "XiaomiMiMo/MiMo-V2.6-Pro", "ctx": 1050000, "p": "0.000000435", "c": "0.000000870"}, {"id": "MiniMaxAI/MiniMax-M2.5", "ctx": 196608, "p": "0.000000300", "c": "0.000001200"}, {"id": "MiniMaxAI/MiniMax-M3.1-Flash", "ctx": 1048576, "p": "0.000000150", "c": "0.000000600"}, {"id": "moonshotai/Kimi-K2.5", "ctx": 262144, "p": "0.000000600", "c": "0.000003000"}, {"id": "moonshotai/Kimi-K2.6", "ctx": 262144, "p": "0.000000950", "c": "0.000004000"}, {"id": "moonshotai/kimi-k2.7-code", "ctx": 262144, "p": "0.000000950", "c": "0.000004000"}, {"id": "moonshotai/Kimi-K2-Instruct-0905", "ctx": 262144, "p": "0.000000570", "c": "0.000002290"}, {"id": "moonshotai/Kimi-K2-Thinking", "ctx": 262144, "p": "0.000000800", "c": "0.000001200"}, {"id": "moonshotai/kimi-k3.1-pro", "ctx": 1048576, "p": "0.000002000", "c": "0.000010000"}, {"id": "nvidia/nemotron-3-ultra-550b-a55b", "ctx": 262144, "p": "0.000000800", "c": "0.000002600"}, {"id": "zai-org/GLM-4.7-FP8", "ctx": 202752, "p": "0.000000600", "c": "0.000002200"}, {"id": "Qwen/Qwen3.5-122B-A10B", "ctx": 262144, "p": "0.000000400", "c": "0.000003200"}, {"id": "Qwen/Qwen3.5-27B", "ctx": 262144, "p": "0.000000300", "c": "0.000002400"}, {"id": "Qwen/Qwen3.5-35B-A3B", "ctx": 262144, "p": "0.000000250", "c": "0.000002000"}, {"id": "Qwen/Qwen3.5-397B-A17B", "ctx": 262144, "p": "0.000000600", "c": "0.000003600"}, {"id": "Qwen/Qwen3.6-35B-A3B", "ctx": 262144, "p": "0.000000248", "c": "0.000001485"}, {"id": "Qwen/Qwen3.6-Plus", "ctx": 262144, "p": "0.000000500", "c": "0.000003000"}, {"id": "Qwen/Qwen3.6-Plus-2026-04-02", "ctx": 262144, "p": "0.000000500", "c": "0.000003000"}, {"id": "Qwen/Qwen3.8-Flash", "ctx": 1048575, "p": "0.000000160", "c": "0.000000470"}, {"id": "Qwen/Qwen3.8-Max-0902", "ctx": 262144, "p": "0.000001650", "c": "0.000004951"}, {"id": "Qwen/Qwen3-Next-80B-A3B-Instruct", "ctx": 262144, "p": "0.000000150", "c": "0.000001500"}, {"id": "Qwen/Qwen3-Next-80B-A3B-Thinking", "ctx": 262144, "p": "0.000000150", "c": "0.000001500"}, {"id": "Qwen/Qwen3-235B-A22B-Instruct-2507-FP8", "ctx": 262144, "p": "0.000000350", "c": "0.000001400"}, {"id": "Qwen/Qwen3-235B-A22B-Thinking-2507-FP8", "ctx": 262141, "p": "0.000000350", "c": "0.000004200"}, {"id": "Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8", "ctx": 262128, "p": "0.000000900", "c": "0.000004500"}, {"id": "gmicloud/Ripple-65B-Preview", "ctx": null, "p": null, "c": null}, {"id": "stepfun-ai/Step-5-Preview", "ctx": 1048576, "p": "0.000001000", "c": "0.000002700"}, {"id": "tencent/hy3-preview", "ctx": 262144, "p": "0.000000180", "c": "0.000000600"}, {"id": "tencent/hy4", "ctx": 1000000, "p": "0.000000834", "c": "0.000002501"}, {"id": "tencent/hy4-preview", "ctx": 262144, "p": "0.000000834", "c": "0.000002501"}, {"id": "zai-org/GLM-5.3", "ctx": 1048576, "p": "0.000001400", "c": "0.000004400"}];
+var DATASET = [{"id": "S01", "cat": "sql-injection", "sev": "high", "label": "real", "title": "SQL string concatenation with user input", "code": "query = \"SELECT * FROM users WHERE id = '\" + request.args['id'] + \"'\"\ncursor.execute(query)", "why": "User input is concatenated directly into SQL with no parameterisation, so an attacker can inject SQL."}, {"id": "S02", "cat": "sql-injection", "sev": "high", "label": "real", "title": "f-string SQL query", "code": "cursor.execute(f\"SELECT balance FROM accounts WHERE user='{username}'\")", "why": "f-string interpolation puts untrusted input straight into SQL."}, {"id": "S03", "cat": "xss", "sev": "medium", "label": "real", "title": "Unescaped user input in HTML response", "code": "return f\"<h1>Hello {request.args['name']}</h1>\"", "why": "Reflected user input is rendered as HTML with no escaping, enabling reflected XSS."}, {"id": "S04", "cat": "xss", "sev": "high", "label": "real", "title": "innerHTML with user data", "code": "el.innerHTML = location.hash.slice(1)", "why": "Assigning untrusted data to innerHTML executes it as HTML/JS, DOM XSS."}, {"id": "S05", "cat": "ssrf", "sev": "high", "label": "real", "title": "Fetch user-supplied URL server-side", "code": "resp = requests.get(request.json['url'], timeout=5)", "why": "Server fetches an attacker-controlled URL, SSRF to internal services and cloud metadata."}, {"id": "S06", "cat": "ssrf", "sev": "medium", "label": "real", "title": "Image proxy without allowlist", "code": "return requests.get(user_url).content", "why": "No allowlist or private-IP block, so internal hosts can be reached through the proxy."}, {"id": "S07", "cat": "path-traversal", "sev": "high", "label": "real", "title": "File path from user input, no sanitisation", "code": "open(os.path.join('/data', request.args['file']))", "why": "An attacker can use ../ to read files outside /data."}, {"id": "S08", "cat": "command-injection", "sev": "critical", "label": "real", "title": "Shell command with user input", "code": "os.system('ping -c 1 ' + host)", "why": "User input reaches a shell command, command injection via ; or &&."}, {"id": "S09", "cat": "command-injection", "sev": "high", "label": "real", "title": "subprocess shell=True with input", "code": "subprocess.run(f'ls {user_dir}', shell=True)", "why": "shell=True with interpolated input allows command injection."}, {"id": "S10", "cat": "hardcoded-secret", "sev": "high", "label": "real", "title": "Hardcoded API key in source", "code": "API_KEY = 'sk-live-9f2a7b4c1d8e6f0a3b5c7d9e1f2a4b6c8d0'", "why": "A live secret committed in source code can be extracted from the repo."}, {"id": "S11", "cat": "hardcoded-secret", "sev": "medium", "label": "real", "title": "Hardcoded database password", "code": "DB_PASSWORD = 'admin123'", "why": "Credentials in code are visible to anyone with repo access."}, {"id": "S12", "cat": "weak-crypto", "sev": "medium", "label": "real", "title": "MD5 for password hashing", "code": "hashlib.md5(password.encode()).hexdigest()", "why": "MD5 is fast and collision-prone, unsuitable for password hashing; use bcrypt/argon2."}, {"id": "S13", "cat": "weak-crypto", "sev": "high", "label": "real", "title": "AES ECB mode", "code": "cipher = AES.new(key, AES.MODE_ECB)", "why": "ECB leaks plaintext patterns; use GCM/CBC with a random IV."}, {"id": "S14", "cat": "insecure-deserialization", "sev": "critical", "label": "real", "title": "pickle.loads on user data", "code": "obj = pickle.loads(request.data)", "why": "Unpickling untrusted data can execute arbitrary code."}, {"id": "S15", "cat": "insecure-deserialization", "sev": "high", "label": "real", "title": "yaml.load without SafeLoader", "code": "data = yaml.load(user_yaml)", "why": "Unsafe YAML loading can construct arbitrary Python objects."}, {"id": "S16", "cat": "jwt", "sev": "high", "label": "real", "title": "JWT verified without signature check", "code": "payload = jwt.decode(token, options={'verify_signature': False})", "why": "Signature verification is disabled, so any token is accepted."}, {"id": "S17", "cat": "jwt", "sev": "medium", "label": "real", "title": "JWT with none algorithm accepted", "code": "jwt.decode(token, key='', algorithms=['none', 'HS256'])", "why": "The none algorithm means no signature is required."}, {"id": "S18", "cat": "auth-bypass", "sev": "critical", "label": "real", "title": "Authentication check that always passes", "code": "if user_input == 'admin' or True:\n    grant_access()", "why": "The or True makes the check always pass, authentication bypass."}, {"id": "S19", "cat": "auth-bypass", "sev": "high", "label": "real", "title": "Password compared with == in timing-unsafe way, no check on empty", "code": "if password == stored or password == '':\n    login()", "why": "An empty password is accepted, authentication bypass."}, {"id": "S20", "cat": "idor", "sev": "high", "label": "real", "title": "Direct object reference, no ownership check", "code": "return get_invoice(request.args['invoice_id'])", "why": "No check that the invoice belongs to the logged-in user, IDOR."}, {"id": "S21", "cat": "idor", "sev": "medium", "label": "real", "title": "Profile fetched by user-supplied id, no check", "code": "user = db.get_user(request.args['id'])\nreturn user.email", "why": "Any user id can be requested, exposing other users data."}, {"id": "S22", "cat": "csrf", "sev": "medium", "label": "real", "title": "State-changing POST with no CSRF token", "code": "@app.post('/transfer')\ndef transfer():\n    send_money(request.form['to'], request.form['amount'])", "why": "No CSRF protection on a money transfer, cross-site request forgery."}, {"id": "S23", "cat": "open-redirect", "sev": "medium", "label": "real", "title": "Redirect to user-supplied URL", "code": "return redirect(request.args['next'])", "why": "Unvalidated redirect can send users to a phishing site."}, {"id": "S24", "cat": "sensitive-data", "sev": "medium", "label": "real", "title": "Password logged in plaintext", "code": "logger.info(f'login failed for {username} password={password}')", "why": "Passwords in logs leak credentials to anyone with log access."}, {"id": "S25", "cat": "sensitive-data", "sev": "high", "label": "real", "title": "Private key sent to client", "code": "return jsonify({'key': private_key_pem})", "why": "A private key is exposed to the client, it must stay server-side."}, {"id": "F01", "cat": "sql-injection", "sev": "low", "label": "false_positive", "title": "Parameterised SQL query", "code": "cursor.execute('SELECT * FROM users WHERE id = %s', (user_id,))", "why": "Parameters are bound safely, no injection is possible here."}, {"id": "F02", "cat": "sql-injection", "sev": "low", "label": "false_positive", "title": "SQL with constant, no user input", "code": "cursor.execute('SELECT id, name FROM products ORDER BY created_at DESC LIMIT 10')", "why": "Query is a constant with no user input."}, {"id": "F03", "cat": "xss", "sev": "low", "label": "false_positive", "title": "User input escaped by template engine", "code": "return render_template('hello.html', name=name)", "why": "Jinja2 autoescapes by default, so the name is escaped in HTML."}, {"id": "F04", "cat": "xss", "sev": "low", "label": "false_positive", "title": "textContent assignment, not innerHTML", "code": "el.textContent = userName", "why": "textContent does not parse HTML, so no XSS."}, {"id": "F05", "cat": "ssrf", "sev": "low", "label": "false_positive", "title": "Fetch from a fixed allowlisted host", "code": "resp = requests.get('https://api.example.com/v1/status', timeout=5)", "why": "URL is a fixed constant, not user-controlled."}, {"id": "F06", "cat": "ssrf", "sev": "low", "label": "false_positive", "title": "URL validated against allowlist before fetch", "code": "if url.startswith('https://cdn.example.com/'):\n    resp = requests.get(url)", "why": "Only the allowlisted CDN host is reachable."}, {"id": "F07", "cat": "path-traversal", "sev": "low", "label": "false_positive", "title": "Path checked to stay inside base dir", "code": "p = (BASE / filename).resolve()\nif BASE in p.parents:\n    open(p)", "why": "The resolved path is checked to stay under BASE before opening."}, {"id": "F08", "cat": "command-injection", "sev": "low", "label": "false_positive", "title": "subprocess with argument list, no shell", "code": "subprocess.run(['ls', user_dir], shell=False)", "why": "Arguments are passed as a list with no shell, so no injection."}, {"id": "F09", "cat": "command-injection", "sev": "low", "label": "false_positive", "title": "Command is a fixed constant", "code": "os.system('ls -la /tmp')", "why": "Command is a constant with no user input."}, {"id": "F10", "cat": "hardcoded-secret", "sev": "low", "label": "false_positive", "title": "Placeholder secret in example code", "code": "API_KEY = 'YOUR_API_KEY_HERE'  # replace with your key", "why": "This is a placeholder, not a real secret."}, {"id": "F11", "cat": "hardcoded-secret", "sev": "low", "label": "false_positive", "title": "Secret loaded from environment", "code": "API_KEY = os.environ['API_KEY']", "why": "The secret comes from the environment, not from source code."}, {"id": "F12", "cat": "weak-crypto", "sev": "low", "label": "false_positive", "title": "MD5 used only as a cache key, not for security", "code": "cache_key = hashlib.md5(url.encode()).hexdigest()", "why": "MD5 here is a non-security checksum for a cache key, not hashing a password."}, {"id": "F13", "cat": "weak-crypto", "sev": "low", "label": "false_positive", "title": "SHA-256 for file integrity check", "code": "hashlib.sha256(data).hexdigest()", "why": "SHA-256 is a sound integrity hash for this use."}, {"id": "F14", "cat": "insecure-deserialization", "sev": "low", "label": "false_positive", "title": "json.loads on user data", "code": "data = json.loads(request.data)", "why": "JSON parsing does not construct arbitrary objects, unlike pickle."}, {"id": "F15", "cat": "insecure-deserialization", "sev": "low", "label": "false_positive", "title": "yaml.safe_load", "code": "data = yaml.safe_load(user_yaml)", "why": "SafeLoader only constructs plain Python types."}, {"id": "F16", "cat": "jwt", "sev": "low", "label": "false_positive", "title": "JWT verified with secret and algorithm", "code": "payload = jwt.decode(token, SECRET, algorithms=['HS256'])", "why": "Signature is verified with a secret and a pinned algorithm."}, {"id": "F17", "cat": "jwt", "sev": "low", "label": "false_positive", "title": "JWT decode in a test with a mock key", "code": "payload = jwt.decode(token, 'test-secret', algorithms=['HS256'])  # test only", "why": "This is test code with a mock secret, not production auth."}, {"id": "F18", "cat": "auth-bypass", "sev": "low", "label": "false_positive", "title": "Admin check with proper role lookup", "code": "if current_user.role == 'admin':\n    grant_access()", "why": "Role is checked from the authenticated session, not from user input."}, {"id": "F19", "cat": "auth-bypass", "sev": "low", "label": "false_positive", "title": "Password verified with bcrypt check", "code": "if bcrypt.checkpw(password.encode(), stored_hash):\n    login()", "why": "Password is verified against a bcrypt hash, no bypass."}, {"id": "F20", "cat": "idor", "sev": "low", "label": "false_positive", "title": "Ownership checked before returning invoice", "code": "inv = get_invoice(invoice_id)\nif inv.owner_id != current_user.id: abort(403)", "why": "Ownership is checked, so other users invoices are not returned."}, {"id": "F21", "cat": "idor", "sev": "low", "label": "false_positive", "title": "Profile fetched from session, not from input", "code": "user = db.get_user(current_user.id)", "why": "The id comes from the authenticated session, not from user input."}, {"id": "F22", "cat": "csrf", "sev": "low", "label": "false_positive", "title": "POST protected by CSRF token decorator", "code": "@app.post('/transfer')\n@csrf_protect\ndef transfer(): ...", "why": "CSRF protection is applied to this state-changing endpoint."}, {"id": "F23", "cat": "open-redirect", "sev": "low", "label": "false_positive", "title": "Redirect validated to same host", "code": "if urlparse(next_url).netloc == 'example.com':\n    return redirect(next_url)", "why": "Redirect is limited to the site's own host."}, {"id": "F24", "cat": "sensitive-data", "sev": "low", "label": "false_positive", "title": "Username logged, no password", "code": "logger.info(f'login failed for {username}')", "why": "Only the username is logged, no credential is present."}, {"id": "F25", "cat": "sensitive-data", "sev": "low", "label": "false_positive", "title": "Public key sent to client", "code": "return jsonify({'public_key': public_key_pem})", "why": "A public key is meant to be shared, this is not sensitive."}];
+var TESTED = [
+  {id:"google/gemini-3.5-flash-lite", short:"Gemini 3.5 Flash Lite", precision:1.000, recall:1.000, f1:1.000, accuracy:1.000, tp:25, fp:0, tn:25, fn:0, unparsed:0, latency:2.87, cpf:0.000133, total:0.006663},
+  {id:"Qwen/Qwen3.8-Flash", short:"Qwen3.8-Flash", precision:1.000, recall:1.000, f1:1.000, accuracy:1.000, tp:25, fp:0, tn:25, fn:0, unparsed:0, latency:3.85, cpf:0.000157, total:0.007836},
+  {id:"zai-org/GLM-5.3-Flash", short:"GLM-5.3-Flash", precision:0.962, recall:1.000, f1:0.980, accuracy:0.980, tp:25, fp:1, tn:24, fn:0, unparsed:0, latency:3.53, cpf:0.000207, total:0.010345},
+  {id:"deepseek-ai/DeepSeek-V4.1-Flash", short:"DeepSeek-V4.1-Flash", precision:1.000, recall:1.000, f1:1.000, accuracy:0.980, tp:25, fp:0, tn:24, fn:0, unparsed:1, latency:4.09, cpf:0.000539, total:0.026937}
+];
+var SCORED = [
+  {id:"XiaomiMiMo/MiMo-V2.6-Flash", short:"MiMo-V2.6-Flash", precision:0.926, recall:1.000, f1:0.962, accuracy:0.960, latency:5.21, cpf:0.000052, total:0.002579, unparsed:0},
+  {id:"deepseek-ai/DeepSeek-V3-0324", short:"DeepSeek-V3-0324", precision:0.852, recall:1.000, f1:0.920, accuracy:0.820, latency:1.83, cpf:0.000073, total:0.003640, unparsed:5},
+  {id:"google/gemini-3.1-flash-lite-preview", short:"Gemini 3.1 Flash Lite Preview", precision:0.774, recall:1.000, f1:0.873, accuracy:0.840, latency:2.48, cpf:0.000093, total:0.004638, unparsed:1},
+  {id:"deepseek-ai/DeepSeek-V4-Flash", short:"DeepSeek-V4-Flash", precision:0.893, recall:1.000, f1:0.943, accuracy:0.920, latency:3.77, cpf:0.000104, total:0.005190, unparsed:1},
+  {id:"google/gemini-3.5-flash-lite", short:"Gemini 3.5 Flash Lite", precision:1.000, recall:1.000, f1:1.000, accuracy:1.000, latency:2.87, cpf:0.000133, total:0.006663, unparsed:0},
+  {id:"MiniMaxAI/MiniMax-M3", short:"MiniMax-M3", precision:0.889, recall:0.960, f1:0.923, accuracy:0.920, latency:1.64, cpf:0.000134, total:0.006724, unparsed:0},
+  {id:"Qwen/Qwen3.8-Flash", short:"Qwen3.8-Flash", precision:1.000, recall:1.000, f1:1.000, accuracy:1.000, latency:3.85, cpf:0.000157, total:0.007836, unparsed:0},
+  {id:"deepseek-ai/DeepSeek-V3.2", short:"DeepSeek-V3.2", precision:0.958, recall:0.920, f1:0.939, accuracy:0.940, latency:5.60, cpf:0.000181, total:0.009028, unparsed:0},
+  {id:"zai-org/GLM-5.3-Flash", short:"GLM-5.3-Flash", precision:0.962, recall:1.000, f1:0.980, accuracy:0.980, latency:3.53, cpf:0.000207, total:0.010345, unparsed:0},
+  {id:"MiniMaxAI/MiniMax-M3.1-Flash", short:"MiniMax-M3.1-Flash", precision:1.000, recall:1.000, f1:1.000, accuracy:0.980, latency:2.86, cpf:0.000220, total:0.011013, unparsed:1},
+  {id:"deepseek-ai/deepseek-v4.1-flash-1017", short:"DeepSeek V4.1 Flash 1017", precision:1.000, recall:0.920, f1:0.958, accuracy:0.960, latency:1.72, cpf:0.000376, total:0.018812, unparsed:0},
+  {id:"deepseek-ai/DeepSeek-V4-Flash-0731", short:"DeepSeek-V4-Flash-0731", precision:0.923, recall:1.000, f1:0.960, accuracy:0.940, latency:3.89, cpf:0.000464, total:0.023197, unparsed:1},
+  {id:"deepseek-ai/deepseek-v4-flash-vision-exp", short:"DeepSeek V4 Flash Vision Exp", precision:1.000, recall:1.000, f1:1.000, accuracy:1.000, latency:3.86, cpf:0.000470, total:0.023517, unparsed:0},
+  {id:"XiaomiMiMo/MiMo-V2.6-Pro", short:"MiMo-V2.6-Pro", precision:0.962, recall:1.000, f1:0.980, accuracy:0.980, latency:5.01, cpf:0.000478, total:0.023911, unparsed:0},
+  {id:"MiniMaxAI/MiniMax-M2.7", short:"MiniMax-M2.7", precision:0.862, recall:1.000, f1:0.926, accuracy:0.920, latency:7.77, cpf:0.000519, total:0.025958, unparsed:0},
+  {id:"deepseek-ai/DeepSeek-V4.1-Flash", short:"DeepSeek-V4.1-Flash", precision:1.000, recall:1.000, f1:1.000, accuracy:0.980, latency:4.09, cpf:0.000539, total:0.026937, unparsed:1},
+  {id:"MiniMaxAI/MiniMax-M2.5", short:"MiniMax-M2.5", precision:1.000, recall:1.000, f1:1.000, accuracy:0.960, latency:9.16, cpf:0.000606, total:0.030323, unparsed:2},
+  {id:"tencent/Hy3", short:"Hy3", precision:1.000, recall:0.913, f1:0.955, accuracy:0.900, latency:17.39, cpf:0.000624, total:0.031205, unparsed:3},
+  {id:"tencent/hy3-preview", short:"Hy3 Preview", precision:1.000, recall:0.875, f1:0.933, accuracy:0.900, latency:19.08, cpf:0.000629, total:0.031454, unparsed:2},
+  {id:"Qwen/Qwen3.6-35B-A3B", short:"Qwen3.6-35B-A3B", precision:0.962, recall:1.000, f1:0.980, accuracy:0.980, latency:10.38, cpf:0.001665, total:0.083255, unparsed:0},
+  {id:"deepseek-ai/DeepSeek-R1-0528", short:"DeepSeek-R1-0528", precision:0.920, recall:1.000, f1:0.958, accuracy:0.840, latency:25.60, cpf:0.002436, total:0.121789, unparsed:6},
+  {id:"Qwen/Qwen3.5-35B-A3B", short:"Qwen3.5-35B-A3B", precision:0.926, recall:1.000, f1:0.962, accuracy:0.960, latency:23.24, cpf:0.003770, total:0.188493, unparsed:0}
+];
+var UNAVAIL = [
+  {id:"inclusionAI/Ling-3.0-flash-fin", err:"HTTP 404 No matching target server found", kind:"Permanent"},
+  {id:"moonshotai/Kimi-K2-Thinking", err:"HTTP 404 No matching target server found", kind:"Permanent"},
+  {id:"zai-org/GLM-4.7-FP8", err:"HTTP 400 UnavailableModel, model deprecated and no longer available", kind:"Permanent, deprecated"},
+  {id:"google/gemma-4-26b-a4b-it", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"google/gemma-4-31b-it", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"stepfun-ai/Step-3.7-Flash", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"moonshotai/Kimi-K2-Instruct-0905", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"Qwen/Qwen3-Next-80B-A3B-Instruct", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"Qwen/Qwen3-Next-80B-A3B-Thinking", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"openai/gpt-5.4-nano", err:"HTTP 503 Max retries exhausted, last_status_code 523", kind:"503, may be transient"},
+  {id:"Qwen/Qwen3-235B-A22B-Instruct-2507-FP8", err:"HTTP 503 routing, framework forward exhausted, no eligible worker, code no_capacity", kind:"503, may be transient"},
+  {id:"openai/gpt-6-luna", err:"HTTP 503 routing, framework forward exhausted, no eligible worker, code no_capacity", kind:"503, may be transient"}
+];
+var STRONG = ["openai/gpt-5.6-sol","openai/gpt-6-sol","openai/gpt-6.1-sol","openai/gpt-5.4-pro","deepseek-ai/DeepSeek-V4-Pro","nvidia/nemotron-3-ultra-550b-a55b","Qwen/Qwen3-235B-A22B-Instruct-2507-FP8","moonshotai/Kimi-K2.5","Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8"];
+function byId(id){ for(var i=0;i<ALL_MODELS.length;i++){ if(ALL_MODELS[i].id===id) return ALL_MODELS[i]; } return null; }
+function fmt(n,d){ return n.toFixed(d); }
+function money(n){ return "$"+n.toFixed(6); }
+function money2(n){ return "$"+n.toFixed(4); }
+function priceOf(m){ if(!m||m.p==null||m.c==null) return null; return {p:parseFloat(m.p), c:parseFloat(m.c)}; }
+function promptTokensFor(modelId){ return modelId==="openai/gpt-6.1-sol"?4550:250; }
+function estCost(modelId,n){ var pr=priceOf(byId(modelId)); if(!pr) return null; return n*(promptTokensFor(modelId)*pr.p+2500*pr.c); }
+function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(function(){t.classList.remove("show");},2200); }
+function copyText(txt,msg){
+  function done(){ toast(msg||"Copied"); }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,function(){ fallback(); }); } else fallback();
+  function fallback(){ var ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); done();}catch(e){ toast("Copy failed, select the text manually"); } document.body.removeChild(ta); }
+}
+function downloadJSON(obj,name){ var blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}); var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); document.body.removeChild(a);},300); toast("Exported"); }
+
+/* ---------- Tabs ---------- */
+function showTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){ p.hidden = p.getAttribute("data-panel")!==name; });
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t.getAttribute("data-tab")===name); });
+  document.querySelectorAll("nav.main button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-goto")===name); });
+}
+document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click",function(){ showTab(t.getAttribute("data-tab")); document.getElementById(t.getAttribute("data-tab")).scrollIntoView({behavior:"smooth"}); }); });
+document.querySelectorAll("nav.main button").forEach(function(b){ b.addEventListener("click",function(){ showTab(b.getAttribute("data-goto")); document.getElementById(b.getAttribute("data-goto")).scrollIntoView({behavior:"smooth"}); }); });
+document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener("click",function(){ var id=a.getAttribute("href").slice(1); var el=document.getElementById(id); if(el&&el.classList.contains("tabpanel")) showTab(id); }); });
+
+/* ---------- Tooltip ---------- */
+var tip=document.getElementById("tooltip");
+function bindTip(el,text){ if(!el) return; el.addEventListener("mousemove",function(e){ tip.textContent=text; tip.style.display="block"; var x=Math.min(e.clientX+14, window.innerWidth-290); tip.style.left=x+"px"; tip.style.top=(e.clientY+16)+"px"; }); el.addEventListener("mouseleave",function(){ tip.style.display="none"; }); }
+
+/* ---------- Leaderboard + charts with model toggles ---------- */
+var visible={}; SCORED.forEach(function(m){ visible[m.id]=true; });
+var sortKey="total", sortDir=1;
+var lbFilter="all", lbQuery="";
+var togglesEl=document.getElementById("model-toggles");
+SCORED.forEach(function(m){
+  var b=document.createElement("button"); b.className="toggle-chip"; b.textContent=m.short; b.setAttribute("aria-pressed","true");
+  b.addEventListener("click",function(){ visible[m.id]=!visible[m.id]; b.classList.toggle("off",!visible[m.id]); b.setAttribute("aria-pressed",visible[m.id]?"true":"false"); renderLeaderboard(); renderCharts(); });
+  togglesEl.appendChild(b);
+});
+document.querySelectorAll(".lb-filter").forEach(function(b){ b.addEventListener("click",function(){ document.querySelectorAll(".lb-filter").forEach(function(x){x.classList.remove("active");}); b.classList.add("active"); lbFilter=b.getAttribute("data-filter"); renderLeaderboard(); }); });
+document.getElementById("lb-search").addEventListener("input",function(e){ lbQuery=e.target.value.trim().toLowerCase(); renderLeaderboard(); });
+function renderLeaderboard(){
+  var scored=SCORED.filter(function(m){ return (lbFilter!=="unavailable") && (!lbQuery || m.id.toLowerCase().indexOf(lbQuery)!==-1); });
+  var unav=UNAVAIL.filter(function(m){ return (lbFilter!=="scored") && (!lbQuery || m.id.toLowerCase().indexOf(lbQuery)!==-1); });
+  scored.sort(function(a,b){ var av=a[sortKey==="model"?"id":sortKey], bv=b[sortKey==="model"?"id":sortKey]; if(typeof av==="string") return sortDir*av.localeCompare(bv); return sortDir*(av-bv); });
+  unav.sort(function(a,b){ return a.id.localeCompare(b.id); });
+  var html="";
+  scored.forEach(function(m,i){
+    var rank=i+1;
+    html+="<tr class='"+(visible[m.id]?"":"off")+"'><td class='model-name model-cell' data-label='Model'><span class='rank"+(rank>3?" grey":"")+"'>"+rank+"</span>"+m.id+"</td>"
+      +"<td class='num "+(m.precision===1?"perfect":"")+"' data-label='Precision'>"+fmt(m.precision,3)+"</td>"
+      +"<td class='num "+(m.recall===1?"perfect":"")+"' data-label='Recall'>"+fmt(m.recall,3)+"</td>"
+      +"<td class='num "+(m.f1===1?"perfect":"")+"' data-label='F1'>"+fmt(m.f1,3)+"</td>"
+      +"<td class='num "+(m.accuracy===1?"perfect":"")+"' data-label='Accuracy'>"+fmt(m.accuracy,3)+"</td>"
+      +"<td class='num' data-label='Avg latency'>"+fmt(m.latency,2)+"s</td><td class='num' data-label='Cost / finding'>"+money(m.cpf)+"</td><td class='num' data-label='Total'>"+money(m.total)+"</td>"
+      +"<td class='num' data-label='Unparsed'>"+(m.unparsed>0?"<span class='pill pill-unp'>Unparsed: "+m.unparsed+"</span>":"Unparsed: 0")+"</td></tr>";
+  });
+  unav.forEach(function(m){
+    html+="<tr class='unavail-row'><td class='model-name model-cell' data-label='Model'><span class='rank grey'>&ndash;</span>"+m.id+"<span class='unavail-err'>"+m.err+" &middot; "+m.kind+"</span></td>"
+      +"<td class='num' data-label='Precision'><span class='pill pill-unavail'>Unavailable</span></td>"
+      +"<td class='num' data-label='Recall'>&ndash;</td><td class='num' data-label='F1'>&ndash;</td><td class='num' data-label='Accuracy'>&ndash;</td>"
+      +"<td class='num' data-label='Avg latency'>&ndash;</td><td class='num' data-label='Cost / finding'>&ndash;</td><td class='num' data-label='Total'>$0</td>"
+      +"<td class='num' data-label='Unparsed'>&ndash;</td></tr>";
+  });
+  if(!html) html="<tr><td colspan='9' style='font-family:var(--mono);font-size:13px;color:#a8a8a8'>No models match that search.</td></tr>";
+  document.getElementById("lb-body").innerHTML=html;
+  var cnt=document.getElementById("lb-count"); if(cnt) cnt.textContent="Showing "+(scored.length+unav.length)+" of 34 attempted ("+scored.length+" scored, "+unav.length+" unavailable)";
+  document.querySelectorAll("#lb-table th.sortable").forEach(function(th){ var arr=th.querySelector(".arr"); arr.textContent = th.getAttribute("data-key")===sortKey ? (sortDir===-1?" \u25BC":" \u25B2") : ""; });
+}
+document.querySelectorAll("#lb-table th.sortable").forEach(function(th){ th.addEventListener("click",function(){ var k=th.getAttribute("data-key"); if(k===sortKey) sortDir=-sortDir; else { sortKey=k; sortDir=(k==="model"||k==="total"||k==="cpf"||k==="latency")?1:-1; } renderLeaderboard(); }); });
+
+function renderCharts(){
+  var act=SCORED.filter(function(m){ return visible[m.id]; });
+  var metrics=[["Precision","precision","var(--lime)"],["Recall","recall","var(--lime-dark)"],["F1","f1","#8a8a8a"],["Accuracy","accuracy","#e8e8e8"]];
+  var html="";
+  act.forEach(function(m){
+    html+="<div class='group'><div class='glabel'>"+m.short+"</div>";
+    metrics.forEach(function(mt){ var v=m[mt[1]]; var pct=Math.max(2,((v-0.70)/0.30)*100);
+      html+="<div class='barrow'><span class='bl'>"+mt[0]+"</span><div class='track' data-tip='"+m.short+" "+mt[0]+": "+fmt(v,3)+"'><div class='fill' style='width:"+pct+"%;background:"+mt[2]+"'></div></div><span class='bv'>"+fmt(v,3)+"</span></div>"; });
+    html+="</div>";
+  });
+  if(!act.length) html="<p class='axis-note'>All models are toggled off. Turn one back on above.</p>";
+  var q=document.getElementById("chart-quality"); q.innerHTML=html;
+  q.querySelectorAll("[data-tip]").forEach(function(el){ bindTip(el, el.getAttribute("data-tip")); });
+  hbars("chart-latency",act,"latency",function(v){return fmt(v,2)+"s";},"s average latency");
+  hbars("chart-cost",act,"cpf",function(v){return money(v);}," per finding");
+  drawScatter(act);
+}
+function hbars(elId,act,key,format,unit){
+  var el=document.getElementById(elId); if(!act.length){ el.innerHTML="<p class='axis-note'>All models are toggled off.</p>"; return; }
+  var max=Math.max.apply(null,act.map(function(m){return m[key];}));
+  var sorted=act.slice().sort(function(a,b){return a[key]-b[key];});
+  var html="";
+  sorted.forEach(function(m){ var pct=Math.max(3,(m[key]/max)*100);
+    html+="<div class='hbar'><span class='hl'>"+m.short+"</span><div class='track' data-tip='"+m.short+": "+format(m[key])+unit+"'><div class='fill' style='width:"+pct+"%'></div></div><span class='hv'>"+format(m[key])+"</span></div>"; });
+  el.innerHTML=html;
+  el.querySelectorAll("[data-tip]").forEach(function(e2){ bindTip(e2, e2.getAttribute("data-tip")); });
+}
+function drawScatter(act){
+  var svg=document.getElementById("scatter");
+  var legend=document.getElementById("scatter-legend");
+  var W=560,H=430,L=62,R=20,T=18,B=52,yMin=0.795,yMax=1.012;
+  var lo=Math.log(0.00004)/Math.LN10, hi=Math.log(0.02)/Math.LN10;
+  function X(v){ return L+((Math.log(v)/Math.LN10-lo)/(hi-lo))*(W-L-R); }
+  function Y(v){ return T+(yMax-v)/(yMax-yMin)*(H-T-B); }
+  var palette=["#ddea4d","#ffffff","#a9bd45","#c6c6c6","#8fa32e","#e8e8e8","#7d8f2a","#d8d8d8","#b9cc54","#9a9a9a","#cdd95e","#f0f0f0","#6f7f24","#bfbfbf","#ddea4d","#ffffff","#a9bd45","#c6c6c6","#8fa32e","#e8e8e8","#7d8f2a","#d8d8d8"];
+  function colFor(m){ var i=SCORED.indexOf(m); return palette[i%palette.length]; }
+  var smoke={id:"openai/gpt-6.1-sol",short:"GPT-6.1 Sol",accuracy:1.000,f1:1.000,latency:4.19,cpf:0.009372,total:0.046858};
+  var s="";
+  [0.80,0.85,0.90,0.95,1.00].forEach(function(v){ var perfect=v===1.00; s+="<line x1='"+L+"' y1='"+Y(v)+"' x2='"+(W-R)+"' y2='"+Y(v)+"' stroke='"+(perfect?"#ddea4d":"#2e2e2e")+"' stroke-width='1'"+(perfect?" stroke-dasharray='5 4' stroke-opacity='0.45'":"")+"/><text x='"+(L-9)+"' y='"+(Y(v)+4)+"' fill='#a8a8a8' font-size='11' text-anchor='end' font-family='Geist Mono,monospace'>"+v.toFixed(2)+"</text>"; });
+  if(Y(1.00)>T+4) s+="<text x='"+(W-R)+"' y='"+(Y(1.00)-7)+"' fill='#ddea4d' font-size='9.5' letter-spacing='1.2' text-anchor='end' font-family='Geist Mono,monospace'>PERFECT ACCURACY</text>";
+  [0.00005,0.0001,0.0002,0.0005,0.001,0.002,0.005,0.01,0.02].forEach(function(v){ var last=v===0.02; s+="<line x1='"+X(v)+"' y1='"+T+"' x2='"+X(v)+"' y2='"+(H-B)+"' stroke='#1c1c1c' stroke-width='1'/><text x='"+X(v)+"' y='"+(H-B+19)+"' fill='#a8a8a8' font-size='10' text-anchor='"+(last?"end":"middle")+"' font-family='Geist Mono,monospace'>$"+v.toFixed(4)+"</text>"; });
+  s+="<text x='"+((L+W-R)/2)+"' y='"+(H-6)+"' fill='#8f8f8f' font-size='11' text-anchor='middle' font-family='Geist Mono,monospace'>Cost per finding (log scale)</text>";
+  s+="<text x='17' y='"+((T+H-B)/2)+"' fill='#8f8f8f' font-size='11' text-anchor='middle' font-family='Geist Mono,monospace' transform='rotate(-90 17 "+((T+H-B)/2)+")'>Accuracy</text>";
+  act.forEach(function(m,idx){
+    var cx=X(m.cpf), cy=Y(m.accuracy), col=colFor(m);
+    var above=(idx%2===0);
+    var lx=Math.max(L+30,Math.min(W-R-30,cx)), ly=above?cy-13:cy+20;
+    var tip=m.id+" - accuracy "+fmt(m.accuracy,3)+", F1 "+fmt(m.f1,3)+", latency "+fmt(m.latency,2)+"s, cost per finding "+money(m.cpf)+", total "+money(m.total)+", unparsed "+m.unparsed;
+    if(m.id==="deepseek-ai/DeepSeek-V4.1-Flash") tip+=" - 1 unparsed finding (F07): TP 25, FP 0, TN 24, FN 0 sums to 49 parsed, accuracy 49/50 = 0.980, precision/recall/F1 on the 49 parsed only";
+    if(m.id==="zai-org/GLM-5.3-Flash") tip+=" - includes the F17 miss: a JWT test with a mock key, expected false positive, called real";
+    s+="<g class='scatter-pt' data-tip='"+tip+"'><circle cx='"+cx+"' cy='"+cy+"' r='11' fill='"+col+"' fill-opacity='0.18'/><circle cx='"+cx+"' cy='"+cy+"' r='5.5' fill='"+col+"' stroke='#000' stroke-width='1.5'/><text x='"+lx+"' y='"+ly+"' fill='#fff' font-size='9' font-weight='600' text-anchor='middle' font-family='Archivo,sans-serif'>"+m.short+"</text></g>";
+    if(m.id==="google/gemini-3.5-flash-lite"){
+      s+="<circle cx='"+cx+"' cy='"+cy+"' r='16' fill='none' stroke='#ddea4d' stroke-width='1' stroke-dasharray='4 3'/><text x='"+cx+"' y='"+(cy+32)+"' fill='#ddea4d' font-size='9' letter-spacing='1.5' text-anchor='middle' font-family='Geist Mono,monospace'>BEST VALUE</text>";
+    }
+  });
+  if(act.length){
+    var sx=X(smoke.cpf), sy=Y(smoke.accuracy);
+    var stip="openai/gpt-6.1-sol - SMOKE TEST ONLY, 5 findings, not a full benchmark: precision 1.000, recall 1.000, accuracy 1.000, latency 4.19s, cost per finding $0.009372, total $0.046858.";
+    s+="<g class='scatter-pt' data-tip='"+stip+"'><polygon points='"+sx+","+(sy-13)+" "+(sx+13)+","+sy+" "+sx+","+(sy+13)+" "+(sx-13)+","+sy+"' fill='#ddea4d' fill-opacity='0.16' stroke='#ddea4d' stroke-width='1.5' stroke-dasharray='4 3'/><circle cx='"+sx+"' cy='"+sy+"' r='3' fill='#ddea4d'/><text x='"+(sx-20)+"' y='"+(sy-3)+"' fill='#fff' font-size='11' font-weight='600' text-anchor='end' font-family='Archivo,sans-serif'>GPT-6.1 Sol</text><text x='"+(sx-20)+"' y='"+(sy+12)+"' fill='#fca5a5' font-size='9.5' text-anchor='end' font-family='Geist Mono,monospace'>smoke test only, 5 findings</text></g>";
+  }
+  if(!act.length) s+="<text x='"+((L+W-R)/2)+"' y='210' fill='#a8a8a8' font-size='12' text-anchor='middle' font-family='Geist Mono,monospace'>All models toggled off</text>";
+  svg.innerHTML=s;
+  svg.querySelectorAll("[data-tip]").forEach(function(el){ bindTip(el, el.getAttribute("data-tip")); });
+  if(legend){
+    if(!act.length){ legend.innerHTML="<span>All models are toggled off. Turn one back on above to see the tradeoff.</span>"; }
+    else{
+      var lh="";
+      act.forEach(function(m){ lh+="<span><i class='sl-dot' style='background:"+colFor(m)+"'></i>"+m.short+" &middot; acc "+fmt(m.accuracy,3)+" &middot; "+money(m.cpf)+" / finding</span>"; });
+      lh+="<span><i class='sl-dia'></i>GPT-6.1 Sol, smoke test only, 5 findings &middot; acc 1.000 &middot; $0.009372 / finding</span>";
+      legend.innerHTML=lh;
+    }
+  }
+}
+renderLeaderboard(); renderCharts();
+
+/* ---------- Model cards ---------- */
+var CARDNOTES={
+ "google/gemini-3.5-flash-lite":[["good","Perfect 50 of 50, no misses of any kind."],["good","Fastest model in the run at 2.87s average latency."],["good","Cheapest model in the run at $0.000133 per finding, $0.006663 for all 50."]],
+ "Qwen/Qwen3.8-Flash":[["good","Perfect 50 of 50, no misses of any kind."],["good","Perfect precision and recall at $0.000157 per finding, $0.007836 for all 50."],["bad","Slower than Gemini at 3.85s average latency, about one second more per finding."]],
+ "zai-org/GLM-5.3-Flash":[["good","Caught every real vulnerability, recall 1.000, no false negatives."],["good","Cheap at $0.000207 per finding and mid-pack on speed at 3.53s."],["bad","One miss, finding F17: a JWT test with a mock key, expected false positive, GLM called it real. Precision 0.962."]],
+ "deepseek-ai/DeepSeek-V4.1-Flash":[["good","Precision, recall and F1 of 1.000 on the 49 parsed answers only: TP 25, FP 0, TN 24, FN 0 sums to 49 parsed, with no wrong verdicts among them."],["bad","One unparsed finding, F07: no verdict returned even after a 2500-token re-run, reasoning tokens filled the budget. Accuracy is 49/50 = 0.980 because of that one unparsed answer."],["bad","Costs $0.000539 per finding at 4.09s average latency, far above the perfect and cheaper Gemini and Qwen options."]]
+};
+document.getElementById("model-cards").innerHTML = TESTED.map(function(m){
+  var lis=CARDNOTES[m.id].map(function(n){ return "<li class='"+n[0]+"'>"+n[1]+"</li>"; }).join("");
+  return "<div class='wcard mcard'><h3>"+m.id+"</h3><div class='score'>Accuracy <b>"+fmt(m.accuracy,3)+"</b> &middot; F1 <b>"+fmt(m.f1,3)+"</b> &middot; "+fmt(m.latency,2)+"s avg &middot; "+money(m.cpf)+" per finding</div><ul>"+lis+"</ul><div class='foot'><span class='pill pill-ok'>TP "+m.tp+" &middot; FP "+m.fp+" &middot; TN "+m.tn+" &middot; FN "+m.fn+"</span>"+(m.unparsed>0?"<span class='pill pill-unp'>Unparsed: 1</span>":"<span class='pill pill-fp'>Unparsed: 0</span>")+"<span class='pill pill-fp'>Tested, 50 findings</span></div></div>";
+}).join("") + STRONG.slice(0,4).map(function(id){ var pr=priceOf(byId(id)); var e50=estCost(id,50);
+  return "<div class='wcard mcard'><h3>"+id+"</h3><div class='score'>No benchmark score yet</div><ul><li class='good'>Verified in the live 82-model list on 2026-11-08, prompt "+(pr?money(pr.p):"n/a")+" and completion "+(pr?money(pr.c):"n/a")+" per token.</li><li class='bad'>UNTESTED on this dataset. No score is claimed. Safe upper-bound cost for 50 findings (250 prompt + 2500 completion tokens per finding, completion at max_tokens): "+(e50!=null?money2(e50):"unknown")+".</li></ul><div class='foot'><span class='pill pill-untested'>Untested</span></div></div>";
+}).join("");
+
+/* ---------- Model selector ---------- */
+var pickSel=document.getElementById("model-pick");
+function fillModelPick(filter){
+  var list=ALL_MODELS.filter(function(m){ return !filter || m.id.toLowerCase().indexOf(filter.toLowerCase())!==-1; });
+  pickSel.innerHTML=list.map(function(m){ var tag=SCORED.some(function(t){return t.id===m.id;})?" - SCORED, 50 findings":(UNAVAIL.some(function(u){return u.id===m.id;})?" - UNAVAILABLE 2026-11-08":(STRONG.indexOf(m.id)>-1?" - UNTESTED, strong":" - UNTESTED")); return "<option value='"+m.id+"'>"+m.id+tag+"</option>"; }).join("");
+  document.getElementById("model-count").textContent="Showing "+list.length+" of "+ALL_MODELS.length+" unique models (82 entries in the verified list, one model ID was listed twice)";
+  if(list.length) { pickSel.value=list[0].id; updateModelPrice(); }
+}
+function fmtCtx(ctx){ if(!ctx) return "not listed"; if(ctx>=1000000) return (ctx/1000000).toFixed(2).replace(/\.?0+$/,"")+"M tokens"; return Math.round(ctx/1000)+"K tokens"; }
+function priceHTML(modelId){
+  var m=byId(modelId), pr=priceOf(m);
+  if(!pr) return "<b>"+modelId+"</b><br>No flat per-token price was listed for this model on 2026-11-08, so no cost estimate can be calculated. Context length: "+fmtCtx(m?m.ctx:null)+".";
+  var e1=estCost(modelId,1), e5=estCost(modelId,5), e50=estCost(modelId,50);
+  var pt=promptTokensFor(modelId);
+  return "<b>"+modelId+"</b><br>Prompt "+money(pr.p)+" / token &middot; Completion "+money(pr.c)+" / token<br>Context length: "+fmtCtx(m.ctx)+"<br>Safe upper-bound estimate: 1 finding <b>"+money(e1)+"</b> &middot; 5 findings <b>"+money(e5)+"</b> &middot; 50 findings <b>"+money2(e50)+"</b><br><span style='opacity:.75'>Safe upper-bound basis: "+pt+" prompt tokens + 2500 completion tokens per finding. Completion is priced at max_tokens (2500), so the token count cannot exceed this basis. For openai/gpt-6.1-sol the prompt allowance is 4550 tokens, the observed provider-side count.</span>";
+}
+function updateModelPrice(){
+  var id=pickSel.value; if(!id) return;
+  document.getElementById("model-price").innerHTML=priceHTML(id);
+  var e50=estCost(id,50);
+  document.getElementById("model-capwarn").style.display=(e50!=null&&e50>=1)?"block":"none";
+  syncTriageModel(id);
+}
+pickSel.addEventListener("change",updateModelPrice);
+document.getElementById("model-search").addEventListener("input",function(e){ fillModelPick(e.target.value.trim()); });
+document.getElementById("model-use-triage").addEventListener("click",function(){ showTab("triage"); document.getElementById("triage").scrollIntoView({behavior:"smooth"}); toast("Model set in Live Triage"); });
+document.getElementById("model-export").addEventListener("click",function(){ downloadJSON({verified:"2026-11-08",count:82,models:ALL_MODELS},"gmi-models-82.json"); });
+fillModelPick("");
+
+/* ---------- Recommender ---------- */
+var REC={
+ accuracy:{id:"google/gemini-3.5-flash-lite",why:"Three of the 22 scored models reached a perfect accuracy of 1.000 on all 50 findings: google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash and deepseek-ai/deepseek-v4-flash-vision-exp. Gemini gets the pick because it matched that perfect score at the lowest cost of the three, $0.006663 total, and it is also the best value overall."},
+ fastest:{id:"MiniMaxAI/MiniMax-M3",why:"Fastest verified average latency among the 22 scored models: MiniMaxAI/MiniMax-M3 at 1.64s per finding, accuracy 0.920. The fastest perfect model is google/gemini-3.5-flash-lite at 2.87s per finding with accuracy 1.000, so pick M3 for raw speed and Gemini when the verdict has to be right."},
+ cheapest:{id:"XiaomiMiMo/MiMo-V2.6-Flash",why:"Cheapest verified scored run: XiaomiMiMo/MiMo-V2.6-Flash cost $0.002579 in total for all 50 findings, $0.000052 per finding, with accuracy 0.960 and F1 0.962. If you need perfect accuracy instead, google/gemini-3.5-flash-lite is the best value at $0.006663 total."},
+ value:{id:"google/gemini-3.5-flash-lite",why:"Best value is accuracy per dollar, and Gemini leads on both sides of that trade: accuracy 1.000 at the lowest cost per finding, $0.000133, and the lowest latency. Qwen3.8-Flash is the runner-up, also perfect, at $0.000157 per finding."},
+ coding:{id:"Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8",why:"For code-focused work, Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8 is the specialist coder model in the verified list, at $0.000000900 prompt and $0.000004500 completion per token. It is UNTESTED on this dataset, so no accuracy is claimed for it. The tested fallback is Qwen/Qwen3.8-Flash, perfect at 50 of 50. Run the coder model in Live Triage on your own findings before trusting it."},
+ strongest:{id:"openai/gpt-6.1-sol",why:"The strongest model with any measured result on this page is openai/gpt-6.1-sol: it passed a 5-finding smoke test with precision, recall and accuracy all at 1.000. That is a smoke test, not a full benchmark. It is also by far the most expensive option measured, $0.009372 per finding in that smoke test, roughly 70 times the cost of Gemini per finding. openai/gpt-5.6-sol and openai/gpt-5.4-pro list even higher per-token prices and are fully untested."}
+};
+function renderRec(pri){
+  var r=REC[pri]; var e50=estCost(r.id,50);
+  var testedNote = SCORED.some(function(t){return t.id===r.id;}) ? "<span class='pill pill-ok'>Scored, 50 findings</span>" : (r.id==="openai/gpt-6.1-sol" ? "<span class='pill pill-untested'>Smoke test only, 5 findings</span>" : "<span class='pill pill-untested'>Untested</span>");
+  document.getElementById("rec-out").innerHTML="<h3>"+r.id+"</h3><p style='margin:10px 0'>"+testedNote+"</p><p>"+r.why+"</p><p class='est'>Safe upper-bound cost for 50 findings on this model: <b>"+(e50!=null?money2(e50):"unknown")+"</b>, from its real prices at 250 prompt tokens (4550 for openai/gpt-6.1-sol) + 2500 completion tokens per finding, completion priced at max_tokens. Project cap reference: $5.</p>";
+}
+document.querySelectorAll(".rec-pick").forEach(function(b){ b.addEventListener("click",function(){ document.querySelectorAll(".rec-pick").forEach(function(x){x.classList.remove("active");}); b.classList.add("active"); renderRec(b.getAttribute("data-pri")); }); });
+renderRec("accuracy");
+
+/* ---------- Dataset viewer ---------- */
+var FINDINGS=DATASET.map(function(f){
+  var exp=f.label==="real"?"R":"FP";
+  var v={glm:exp,deepseek:exp,qwen:exp,gemini:exp};
+  if(f.id==="F07") v.deepseek="UNPARSED";
+  if(f.id==="F17") v.glm="R";
+  var miss=(v.glm!==exp)||(v.deepseek!==exp)||(v.qwen!==exp)||(v.gemini!==exp);
+  return {id:f.id,cat:f.cat,sev:f.sev,label:f.label,title:f.title,code:f.code,why:f.why,v:v,miss:miss};
+});
+var catSel=document.getElementById("f-cat");
+Array.from(new Set(FINDINGS.map(function(f){return f.cat;}))).sort().forEach(function(c){ var o=document.createElement("option"); o.value=c; o.textContent=c; catSel.appendChild(o); });
+function pillFor(verdict,expected){
+  if(verdict==="UNPARSED") return "<span class='pill pill-unp'>Unparsed</span>";
+  var ok=verdict===expected;
+  if(verdict==="R") return "<span class='pill "+(ok?"pill-real":"pill-miss")+"'>R</span>";
+  return "<span class='pill "+(ok?"pill-fp":"pill-miss")+"'>FP</span>";
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function renderDataset(){
+  var q=document.getElementById("f-search").value.trim().toLowerCase();
+  var cat=catSel.value, lab=document.getElementById("f-label").value, cor=document.getElementById("f-correct").value;
+  var list=FINDINGS.filter(function(f){
+    if(cat&&f.cat!==cat) return false; if(lab&&f.label!==lab) return false;
+    if(cor==="correct"&&f.miss) return false; if(cor==="miss"&&!f.miss) return false;
+    if(q&&(f.id.toLowerCase().indexOf(q)===-1&&f.cat.indexOf(q)===-1&&f.title.toLowerCase().indexOf(q)===-1)) return false;
+    return true;
+  });
+  var html="";
+  list.forEach(function(f){
+    var exp=f.label==="real"?"R":"FP";
+    var expPill=f.label==="real"?"<span class='pill pill-real'>Real</span>":"<span class='pill pill-fp'>False positive</span>";
+    html+="<tr"+(f.miss?" style='background:#fff8e6'":"")+"><td data-label='ID'><span class='mono' style='font-weight:700'>"+f.id+"</span></td>"
+      +"<td data-label='Finding'><div style='font-weight:600;font-size:13px'>"+esc(f.title)+"</div><div class='finding-code'>"+esc(f.code)+"</div><div class='mono' style='font-size:11px;color:var(--ink2)'>"+f.cat+"</div>"+(f.id==="F17"?"<div class='label-note'><b>Contestable label:</b> this JWT test uses the mock secret 'test-secret' and is labelled false positive because it is test code. A production reviewer could reasonably call it real, and GLM-5.3-Flash did. Treat this label as contestable.</div><div class='label-note'><b>Second reviewer note:</b> if this code were in production auth rather than a test, the label would be real, severity high. GLM called it real. The original false_positive label and the original verdict counts are unchanged.</div>":"")+"</td>"
+      +"<td data-label='Severity'><span class='sev sev-"+f.sev+"'>"+f.sev+"</span></td><td data-label='Expected'>"+expPill+"</td>"
+      +"<td data-label='GLM-5.3' class='verdict-cell'>"+pillFor(f.v.glm,exp)+"</td>"
+      +"<td data-label='DeepSeek' class='verdict-cell'>"+pillFor(f.v.deepseek,exp)+"</td>"
+      +"<td data-label='Qwen3.8' class='verdict-cell'>"+pillFor(f.v.qwen,exp)+"</td>"
+      +"<td data-label='Gemini Lite' class='verdict-cell'>"+pillFor(f.v.gemini,exp)+"</td></tr>";
+  });
+  document.getElementById("ds-body").innerHTML=html;
+  document.getElementById("ds-empty").style.display=list.length?"none":"block";
+  document.getElementById("result-count").innerHTML="Showing <b>"+list.length+" of 50</b> findings";
+}
+["f-search","f-cat","f-label","f-correct"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderDataset); document.getElementById(id).addEventListener("change",renderDataset); });
+renderDataset();
+document.getElementById("ds-export").addEventListener("click",function(){
+  downloadJSON({run_date:"2026-11-08",findings:50,models_attempted:34,models_scored:22,models_unavailable:12,scored_calls:1100,original_4_run:{calls:200,total_full_run_plus_rerun_usd:0.051781},this_pass_cost_usd:0.696507,grand_total_project_usd:0.75,budget_cap_usd:5,models:SCORED,unavailable:UNAVAIL,original_4_models:TESTED,smoke_test:{model:"openai/gpt-6.1-sol",findings:5,note:"5-finding smoke test only, not a full benchmark",precision:1.0,recall:1.0,accuracy:1.0,avg_latency_s:4.19,cost_per_finding_usd:0.009372,total_usd:0.046858},per_finding:FINDINGS},"benchmark-results.json");
+});
+
+/* ---------- Dataset v2 (balanced, NOT run) ---------- */
+var DATASET_V2_NEW=[
+ {id:"S26",cat:"path-traversal",sev:"high",label:"real",title:"Zip Slip: archive entry extracted without path check",code:"for entry in zipfile.namelist():\n    zipfile.extract(entry, '/srv/uploads')",why:"Entry names like ../../etc/cron.d/x are written outside the target directory, Zip Slip path traversal."},
+ {id:"F26",cat:"path-traversal",sev:"low",label:"false_positive",title:"Zip entry path checked before extraction",code:"dest = (TARGET / entry).resolve()\nif TARGET in dest.parents:\n    zipfile.extract(entry, TARGET)",why:"Each entry is resolved and checked to stay inside TARGET before extraction, so no Zip Slip."},
+ {id:"S27",cat:"csrf",sev:"high",label:"real",title:"Password change POST with no CSRF token",code:"@app.post('/account/password')\ndef change_password():\n    current_user.password = hash(request.form['new_password'])",why:"A state-changing password change with no CSRF token can be forced from another site while the user is logged in."},
+ {id:"F27",cat:"csrf",sev:"low",label:"false_positive",title:"CSRF token verified before state change",code:"@app.post('/account/password')\ndef change_password():\n    if not verify_csrf(request.form['csrf_token']): abort(403)\n    current_user.password = hash(request.form['new_password'])",why:"The CSRF token is verified and the request aborts with 403 before any state changes."},
+ {id:"S28",cat:"open-redirect",sev:"medium",label:"real",title:"Login redirect to unvalidated next parameter",code:"return redirect(request.args['next'])",why:"The next parameter is used directly, so an attacker can redirect a victim to a phishing site after login."},
+ {id:"F28",cat:"open-redirect",sev:"low",label:"false_positive",title:"Redirect target checked against allowlist",code:"ALLOWED = {'/dashboard', '/settings'}\nif next_url in ALLOWED:\n    return redirect(next_url)\nreturn redirect('/dashboard')",why:"Only allowlisted local paths are used and anything else falls back to /dashboard, so no open redirect."}
+];
+var DATASET_V2 = DATASET.concat(DATASET_V2_NEW);
+(function(){
+  var el=document.getElementById("ds2-body"); if(!el) return;
+  el.innerHTML=DATASET_V2_NEW.map(function(f){
+    var pill=f.label==="real"?"<span class='pill pill-real'>Real</span>":"<span class='pill pill-fp'>False positive</span>";
+    return "<tr><td data-label='ID'><span class='mono' style='font-weight:700'>"+f.id+"</span></td><td data-label='Finding'><div style='font-weight:600;font-size:13px'>"+esc(f.title)+"</div><div class='finding-code'>"+esc(f.code)+"</div><div class='mono' style='font-size:11.5px;color:var(--ink2)'>"+esc(f.why)+"</div></td><td data-label='Category'><span class='mono' style='font-size:12px'>"+f.cat+"</span></td><td data-label='Severity'><span class='sev sev-"+f.sev+"'>"+f.sev+"</span></td><td data-label='Expected'>"+pill+"</td></tr>";
+  }).join("");
+  var b=document.getElementById("ds2-export");
+  if(b) b.addEventListener("click",function(){ downloadJSON({dataset:"dataset-v2",version:2,status:"NOT RUN, no results exist",findings:56,categories:14,per_category:4,real:28,false_positives:28,added_from_v1:["S26","F26","S27","F27","S28","F28"],safe_upper_bound_cost_4_original_models_usd:0.67,items:DATASET_V2},"dataset-v2.json"); });
+})();
+
+/* ---------- API key handling (sessionStorage only) ---------- */
+var keyInput=document.getElementById("api-key"), keyStatus=document.getElementById("key-status");
+function getKey(){ try{ return sessionStorage.getItem("gmi_api_key")||""; }catch(e){ return ""; } }
+function setKey(v){ try{ if(v) sessionStorage.setItem("gmi_api_key",v); else sessionStorage.removeItem("gmi_api_key"); }catch(e){} refreshKeyUI(); }
+function refreshKeyUI(){
+  var has=!!getKey();
+  document.getElementById("triage-run").disabled=!has;
+  document.getElementById("bench-run").disabled=!has;
+  document.getElementById("triage-nokey").style.display=has?"none":"block";
+  if(has&&keyStatus.className.indexOf("ok")===-1){ keyStatus.className="keystatus ok"; keyStatus.textContent="Key saved for this tab session. Live triage is enabled."; }
+  if(!has){ keyStatus.className="keystatus dim"; keyStatus.textContent="No key entered yet. Add your key to enable live triage."; }
+}
+keyInput.value=getKey();
+keyInput.addEventListener("input",function(){ setKey(keyInput.value.trim()); });
+document.getElementById("key-toggle").addEventListener("click",function(){ var show=keyInput.type==="password"; keyInput.type=show?"text":"password"; this.textContent=show?"Hide":"Show"; });
+document.getElementById("key-clear").addEventListener("click",function(){ keyInput.value=""; setKey(""); keyStatus.className="keystatus dim"; keyStatus.textContent="Key cleared. Nothing is stored now."; toast("Key cleared"); });
+function apiErrorText(status){
+  if(status===401) return "Invalid API key (401). The GMI API rejected this key. Check the key and try again.";
+  if(status===404) return "Model not found (404). That model ID is not available on the API right now.";
+  if(status===429) return "Rate limit (429). Too many requests. Wait a short while and try again.";
+  return "The API returned an error (HTTP "+status+"). No verdict was produced.";
+}
+/* One fetch path for every GMI call: a hard timeout so a stalled request ends
+   with a clear message instead of spinning forever, and one automatic retry
+   when the failure is at network level (a dropped mobile connection, or the
+   API's Cloudflare layer rejecting the browser before any answer comes back).
+   HTTP error statuses are never retried, they are real API answers. */
+function gmiFetch(url,opts,timeoutMs){
+  function attempt(n){
+    var o={}, k; for(k in opts) o[k]=opts[k];
+    var ctl=(typeof AbortController!=="undefined")?new AbortController():null, timedOut=false, timer=null;
+    if(ctl){ o.signal=ctl.signal; timer=setTimeout(function(){ timedOut=true; ctl.abort(); },timeoutMs); }
+    return fetch(url,o).then(function(r){ if(timer) clearTimeout(timer); return r; }).catch(function(e){
+      if(timer) clearTimeout(timer);
+      if(timedOut) throw {timeout:true};
+      if(n<1) return new Promise(function(res){ setTimeout(res,900); }).then(function(){ return attempt(n+1); });
+      throw {network:true};
+    });
+  }
+  return attempt(0);
+}
+function networkErrorText(){
+  return "Network error: the call never got an answer from the GMI API. The API is CORS-open and answers a bad key with a 401, so a network error means the browser was stopped before any answer came back. This API sits behind Cloudflare, which can reject in-app browsers and webviews by their browser signature, and a VPN, a content blocker, or a dropped mobile connection does the same thing. Open this page in a full browser (Chrome or Safari, not an in-app viewer), turn off any VPN or blocker, check your connection, and try again.";
+}
+function timeoutErrorText(sec){
+  return "The request timed out after "+sec+" seconds with no answer from the GMI API. Check your connection, and if you are in an in-app browser or webview, open this page in a full browser (Chrome or Safari) and try again.";
+}
+document.getElementById("key-test").addEventListener("click",function(){
+  var key=keyInput.value.trim(); if(!key){ keyStatus.className="keystatus err"; keyStatus.textContent="Enter a key first, then press Test Key."; return; }
+  setKey(key); keyStatus.className="keystatus dim"; keyStatus.innerHTML="<span class='spin'></span>Testing key against GET /v1/models...";
+  gmiFetch("https://api.gmi-serving.com/v1/models",{headers:{"Authorization":"Bearer "+key}},25000)
+    .then(function(r){ if(!r.ok) throw {status:r.status}; return r.json(); })
+    .then(function(j){ var n=(j&&j.data)?j.data.length:0; keyStatus.className="keystatus ok"; keyStatus.textContent="Key works, "+n+" models available."; })
+    .catch(function(e){ keyStatus.className="keystatus err"; keyStatus.textContent = e&&e.status ? apiErrorText(e.status) : (e&&e.timeout ? timeoutErrorText(25) : networkErrorText()); });
+});
+
+/* ---------- Live triage ---------- */
+var triModel=document.getElementById("triage-model");
+triModel.innerHTML=ALL_MODELS.map(function(m){ return "<option value='"+m.id+"'>"+m.id+"</option>"; }).join("");
+triModel.value="google/gemini-3.5-flash-lite";
+function syncTriageModel(id){ var tm=document.getElementById("triage-model"); if(!tm) return; if(byId(id)&&tm.options.length) tm.value=id; updateTriagePrice(); }
+function updateTriagePrice(){
+  var tm=document.getElementById("triage-model"); if(!tm||!tm.value) return;
+  document.getElementById("triage-price").innerHTML=priceHTML(tm.value);
+  var e50=estCost(tm.value,50);
+  document.getElementById("bench-est").innerHTML="Safe upper-bound estimate for <b>"+tm.value+"</b>: 50 findings at <b>"+(e50!=null?money2(e50):"unknown")+"</b> (250 prompt, 4550 for Sol, + 2500 completion tokens per finding, completion at max_tokens). Per finding "+(e50!=null?money(e50/50):"unknown")+".";
+  document.getElementById("bench-capwarn").style.display=(e50!=null&&e50>=5)?"block":"none";
+}
+triModel.addEventListener("change",updateTriagePrice);
+updateTriagePrice();
+var EXAMPLES={
+ sqli:"Semgrep finding: python.django.security.audit.query-set-extra-avoid\nSeverity: ERROR\nCode in orders/views.py:\n\ndef get_order(request):\n    order_id = request.GET.get('id')\n    query = \"SELECT * FROM orders WHERE id = '\" + order_id + \"' AND user_id = \" + str(request.user.id)\n    cursor.execute(query)\n    return cursor.fetchone()",
+ jwt:"Semgrep finding: python.flask.security.audit.jwt-hardcoded\nCode in auth/session.py:\n\nimport jwt\n\ndef decode_token(token):\n    # signature check turned off during a debug session and never turned back on\n    payload = jwt.decode(token, options={\"verify_signature\": False})\n    return payload[\"user_id\"]",
+ fp:"Semgrep flagged: possible SQL injection (string formatting in query)\nCode in reports/queries.py:\n\ndef orders_for_user(db, user_id):\n    # user_id comes from the session, and the value is bound as a parameter\n    return db.execute(\n        \"SELECT * FROM orders WHERE user_id = ?\",\n        (user_id,),\n    ).fetchall()"
+};
+document.querySelectorAll(".exbtn").forEach(function(b){ b.addEventListener("click",function(){ document.getElementById("triage-input").value=EXAMPLES[b.getAttribute("data-ex")]; toast("Example loaded"); }); });
+document.getElementById("triage-copycode").addEventListener("click",function(){ var v=document.getElementById("triage-input").value; if(!v){ toast("Nothing to copy yet"); return; } copyText(v,"Code copied"); });
+
+var TRIAGE_PROMPT='You are a security code reviewer. Classify this finding. A finding is real only if untrusted input actually reaches a dangerous sink with no effective mitigation in the code shown. If the code uses parameterisation, escaping, allowlists, or other effective mitigation, it is a false_positive. Return ONLY JSON, no other text: {"verdict": "real" or "false_positive", "severity": "critical|high|medium|low", "confidence": 0-1, "reason": "one short sentence", "fix": "one short sentence"}\n\nFinding:\n';
+var lastVerdict=null;
+function showTriageError(msg){ var e=document.getElementById("triage-error"); e.style.display="block"; e.textContent=msg; }
+function hideTriageError(){ document.getElementById("triage-error").style.display="none"; }
+function callGMI(key,model,text){
+  var t0=performance.now();
+  return gmiFetch("https://api.gmi-serving.com/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({model:model,temperature:0,max_tokens:2500,messages:[{role:"user",content:TRIAGE_PROMPT+text}]})},90000)
+    .then(function(r){ if(!r.ok) throw {status:r.status}; return r.json(); })
+    .then(function(j){ return {json:j, latency:(performance.now()-t0)/1000}; });
+}
+function parseTriage(j){
+  try{
+    var content=j.choices&&j.choices[0]&&j.choices[0].message?j.choices[0].message.content:"";
+    var m=String(content).match(/\{[\s\S]*\}/); if(!m) return null;
+    var d=JSON.parse(m[0]);
+    if(d.verdict!=="real"&&d.verdict!=="false_positive") return null;
+    return d;
+  }catch(e){ return null; }
+}
+document.getElementById("triage-run").addEventListener("click",function(){
+  var key=getKey(); var text=document.getElementById("triage-input").value.trim();
+  hideTriageError();
+  if(!key){ showTriageError("Add your GMI API key first. The triage button stays disabled until a key is entered."); return; }
+  if(!text){ showTriageError("Paste a code snippet, a semgrep or osv finding, or a CVE description first."); return; }
+  var btn=this; btn.disabled=true; btn.innerHTML="<span class='spin'></span>Calling GMI API...";
+  var prog=document.getElementById("triage-progress"); prog.style.display="block"; prog.className="progress indet";
+  document.getElementById("verdict-out").style.display="none"; document.getElementById("verdict-empty").style.display="block"; document.getElementById("verdict-empty").innerHTML="<span class='spin'></span>Waiting for the model...";
+  callGMI(key,triModel.value,text).then(function(res){
+    var d=parseTriage(res.json);
+    if(!d){ document.getElementById("verdict-empty").textContent="No verdict yet."; showTriageError("Unparsed answer. The model replied, but not in the JSON format requested, so no verdict is shown rather than guessing one. Raw usage: "+JSON.stringify(res.json.usage||{})); return; }
+    var usage=res.json.usage||{};
+    lastVerdict={model:triModel.value,verdict:d.verdict,severity:d.severity,confidence:d.confidence,reason:d.reason,fix:d.fix,latency_s:Math.round(res.latency*100)/100,usage:usage,at:new Date().toISOString()};
+    document.getElementById("verdict-empty").style.display="none";
+    var out=document.getElementById("verdict-out"); out.style.display="block";
+    var steps=[
+      ["vs-badge","<span class='vbadge "+(d.verdict==="real"?"real":"fp")+"'>"+(d.verdict==="real"?"Real vulnerability":"False positive")+"</span>"],
+      ["vs-meta","<div class='vmeta'>Severity <b>"+esc(String(d.severity||"n/a"))+"</b> &middot; Confidence <b>"+(typeof d.confidence==="number"?fmt(d.confidence,2):esc(String(d.confidence||"n/a")))+"</b> &middot; Model <b>"+triModel.value+"</b><br>Latency <b>"+fmt(res.latency,2)+"s</b> &middot; Tokens: prompt "+(usage.prompt_tokens!=null?usage.prompt_tokens:"n/a")+", completion "+(usage.completion_tokens!=null?usage.completion_tokens:"n/a")+", total "+(usage.total_tokens!=null?usage.total_tokens:"n/a")+"</div>"],
+      ["vs-reason","<div class='vtext'><span class='vl'>Reason</span>"+esc(String(d.reason||""))+"</div>"],
+      ["vs-fix","<div class='vtext'><span class='vl'>Suggested fix</span>"+esc(String(d.fix||""))+"</div>"],
+      ["vs-actions",null]
+    ];
+    steps.forEach(function(s,i){ var el=document.getElementById(s[0]); if(s[1]!=null) el.innerHTML=s[1]; el.classList.remove("show"); setTimeout(function(){ el.classList.add("show"); }, 180*(i+1)); });
+  }).catch(function(e){
+    document.getElementById("verdict-empty").textContent="No verdict yet.";
+    showTriageError(e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90)+" No verdict was produced.":networkErrorText()+" No verdict was produced."));
+  }).then(function(){
+    btn.disabled=!getKey(); btn.textContent="Triage This Finding \u2197";
+    prog.style.display="none"; prog.className="progress";
+  });
+});
+document.getElementById("copy-verdict").addEventListener("click",function(){ if(!lastVerdict){ toast("No verdict to copy yet"); return; } copyText("Verdict: "+lastVerdict.verdict+"\nSeverity: "+lastVerdict.severity+"\nConfidence: "+lastVerdict.confidence+"\nReason: "+lastVerdict.reason+"\nFix: "+lastVerdict.fix+"\nModel: "+lastVerdict.model,"Verdict copied"); });
+document.getElementById("export-verdict").addEventListener("click",function(){ if(!lastVerdict){ toast("No verdict to export yet"); return; } downloadJSON(lastVerdict,"triage-verdict.json"); });
+
+/* ---------- User-run benchmark ---------- */
+var benchStop=false;
+document.getElementById("bench-stop").addEventListener("click",function(){ benchStop=true; });
+document.getElementById("bench-run").addEventListener("click",function(){
+  var key=getKey(); if(!key) return;
+  var model=triModel.value; benchStop=false;
+  var btn=this, stopBtn=document.getElementById("bench-stop");
+  btn.disabled=true; stopBtn.style.display="inline-flex";
+  var prog=document.getElementById("bench-progress"); prog.style.display="block"; prog.className="progress";
+  var bar=prog.querySelector("i"); var status=document.getElementById("bench-status");
+  var tp=0,fp=0,tn=0,fn=0,unparsed=0,done=0,latSum=0,costSum=0,pr=priceOf(byId(model));
+  var perFinding=[];
+  function step(i){
+    if(benchStop||i>=DATASET.length){ finish(); return; }
+    var f=DATASET[i];
+    status.innerHTML="<span class='spin'></span>Running "+f.id+" ("+(i+1)+" of 50) on "+model+"...";
+    callGMI(key,model,"Finding "+f.id+" ("+f.cat+", severity "+f.sev+")\nTitle: "+f.title+"\nCode:\n"+f.code).then(function(res){
+      var d=parseTriage(res.json); var usage=res.json.usage||{};
+      var cost=pr&&usage.prompt_tokens!=null?(usage.prompt_tokens*pr.p+(usage.completion_tokens||0)*pr.c):0; costSum+=cost; latSum+=res.latency;
+      var verdict=d?d.verdict:"unparsed";
+      if(!d) unparsed++; else if(verdict==="real"&&f.label==="real") tp++; else if(verdict==="real") fp++; else if(f.label==="real") fn++; else tn++;
+      perFinding.push({id:f.id,expected:f.label,verdict:verdict});
+    }).catch(function(e){
+      unparsed++; perFinding.push({id:f.id,expected:f.label,verdict:"error",error:e&&e.status?("HTTP "+e.status):(e&&e.timeout?"timeout":"network")});
+    }).then(function(){
+      done++; bar.style.width=(done*2)+"%";
+      status.textContent="Done "+done+" of 50. Running total so far: TP "+tp+", FP "+fp+", TN "+tn+", FN "+fn+", unparsed "+unparsed+". Spend so far "+money(costSum)+".";
+      step(i+1);
+    });
+  }
+  function finish(){
+    btn.disabled=!getKey(); stopBtn.style.display="none"; prog.style.display="none";
+    var scored=tp+fp+tn+fn;
+    var prec=(tp+fp)>0?tp/(tp+fp):0, rec=(tp+fn)>0?tp/(tp+fn):0, acc=done>0?(tp+tn)/done:0;
+    var f1=(prec+rec)>0?2*prec*rec/(prec+rec):0;
+    var result={model:model,run_by:"user, in browser",at:new Date().toISOString(),findings:done,tp:tp,fp:fp,tn:tn,fn:fn,unparsed:unparsed,precision:Math.round(prec*1000)/1000,recall:Math.round(rec*1000)/1000,f1:Math.round(f1*1000)/1000,accuracy:Math.round(acc*1000)/1000,avg_latency_s:done?Math.round(latSum/done*100)/100:0,total_cost_usd:Math.round(costSum*1000000)/1000000,per_finding:perFinding,stopped_early:benchStop};
+    status.textContent=(benchStop?"Stopped early after ":"Finished ")+done+" of 50 findings on "+model+".";
+    document.getElementById("bench-result").innerHTML="<div class='pricebox' style='margin-top:14px'>Accuracy <b>"+fmt(result.accuracy,3)+"</b> &middot; Precision <b>"+fmt(result.precision,3)+"</b> &middot; Recall <b>"+fmt(result.recall,3)+"</b> &middot; F1 <b>"+fmt(result.f1,3)+"</b><br>TP "+tp+" &middot; FP "+fp+" &middot; TN "+tn+" &middot; FN "+fn+" &middot; Unparsed "+unparsed+"<br>Avg latency "+fmt(result.avg_latency_s,2)+"s &middot; Total cost from returned token usage: <b>"+money(result.total_cost_usd)+"</b></div><div style='margin-top:12px'><button class='btn btn-lime' id='bench-export' type='button'>Export Run JSON</button></div>";
+    document.getElementById("bench-export").addEventListener("click",function(){ downloadJSON(result,"my-benchmark-run.json"); });
+  }
+  step(0);
+});
+refreshKeyUI();
+</script>
+</body>
+</html>
