@@ -4,8 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:,">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000000'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23DDEA4D'/%3E%3C/svg%3E">
 <title>Security Model Benchmark - GMI Cloud Inference Engine</title>
+<meta name="description" content="25 GMI models benchmarked on 50 labelled security findings, 25 real and 25 false positives. Best value: Gemini 3.5 Flash Lite, perfect accuracy for $0.006663. Triage your own code live with any of 81 GMI models.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Security Model Benchmark - GMI Cloud">
+<meta property="og:description" content="25 GMI models scored on 50 security findings. Three perfect scores. Best value Gemini 3.5 Flash Lite, $0.006663 for 50 findings. Live triage with your own GMI key.">
+<meta property="og:url" content="https://gmi-benchmark.vercel.app/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Security Model Benchmark - GMI Cloud">
+<meta name="twitter:description" content="25 GMI models scored on 50 security findings. Best value Gemini 3.5 Flash Lite, perfect for $0.006663.">
+<meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://gmi-benchmark.vercel.app/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Security Model Benchmark on GMI Cloud","description":"50 labelled security findings, 25 real and 25 false positives, used to benchmark 25 GMI models at temperature 0.","url":"https://gmi-benchmark.vercel.app/","creator":{"@type":"Person","name":"Jayanng"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,6 +39,7 @@ h1,h2,h3{font-family:var(--sans);letter-spacing:-.02em;margin:0}
 .wrap{max-width:1500px;margin:0 auto;padding:0 clamp(20px,6vw,90px)}
 button{font-family:var(--mono);cursor:pointer}
 :focus-visible{outline:2px solid var(--lime-dark);outline-offset:2px}
+.skip-link:focus{left:0 !important}
 ::selection{background:var(--lime);color:#000}
 
 /* ---------- Header ---------- */
@@ -231,7 +243,9 @@ tr.unavail-row td{color:#a8a8a8}
 </style>
 </head>
 <body>
+<a href="#benchmark" class="skip-link" style="position:absolute;left:-9999px;top:0;background:#DDEA4D;color:#000;padding:10px 14px;font-family:monospace;z-index:300">Skip to leaderboard</a>
 <div id="tooltip" role="status"></div>
+<div class="run-banner" style="background:#DDEA4D;color:#000;font-family:monospace;font-size:12.5px;padding:10px 20px;text-align:center;line-height:1.6">Left-models run in progress since 2026-11-09 13:14 UTC, $10 actual-spend cap, max_tokens 800. Leaderboard below is the verified 25-model snapshot as of 13:11 UTC. New scores are verified before they are merged, they do not appear live.</div>
 
 <header>
   <div class="header-in">
@@ -253,7 +267,7 @@ tr.unavail-row td{color:#a8a8a8}
   <div class="wrap">
     <p class="eyebrow"><span class="dot">&#9679;</span> GMI Cloud Inference Engine &middot; Run 2026-11-08</p>
     <h1 class="glitch"><span class="lime">Security triage,</span> measured.<span class="cursor" aria-hidden="true"></span></h1>
-    <p class="hero-sub">34 GMI models were attempted on the same 50 security findings, 25 real vulnerabilities and 25 false positives, with one prompt at temperature 0. 22 returned scores, 12 were unavailable on the day. Three scored a perfect 50 of 50. Then take any model from the full 82-model catalogue and triage your own code, live, with your own GMI API key.</p>
+    <p class="hero-sub">37 GMI models were attempted on the same 50 security findings, 25 real vulnerabilities and 25 false positives, with one prompt at temperature 0. 25 returned scores, 12 were unavailable on the day. Three scored a perfect 50 of 50. Then take any model from the full 81-model catalogue (82 entries, one duplicate) and triage your own code, live, with your own GMI API key.</p>
     <div class="hero-ctas">
       <a class="btn btn-lime btn-lg" href="#triage">Run Live Triage &#8599;</a>
       <a class="btn btn-outline btn-lg" href="#benchmark">View Benchmark &#8599;</a>
@@ -262,17 +276,17 @@ tr.unavail-row td{color:#a8a8a8}
       <div class="hstat"><div class="k">Best accuracy</div><div class="v"><em>1.000</em></div><div class="s">Gemini 3.5 Flash Lite, Qwen3.8-Flash and DeepSeek V4 Flash Vision Exp, all perfect at 50 of 50.</div></div>
       <div class="hstat"><div class="k">Models attempted</div><div class="v">37</div><div class="s">25 scored on all 50 findings. 12 unavailable, flagged with their HTTP error, never scored as zero.</div></div>
       <div class="hstat"><div class="k">Best value</div><div class="v">$0.006663</div><div class="s">Gemini 3.5 Flash Lite: a perfect 50-finding run for $0.006663 total, $0.000133 per finding.</div></div>
-      <div class="hstat"><div class="k">Total spend vs cap</div><div class="v">$1.21<em> / $5</em></div><div class="s">Scored runs cost $1.156338: 2026-11-08 pass $0.696507 plus Batch 1-A 2026-11-09 $0.459831. Grand total for the whole project is about $1.21, well under the $5 cap.</div></div>
+      <div class="hstat"><div class="k">Total spend vs cap</div><div class="v">$1.21<em> / $5</em></div><div class="s">Scored runs cost $1.156338: 2026-11-08 pass $0.696507 plus Batch 1-A 2026-11-09 $0.459831. Grand total for the whole project is about $1.21, well under the original $5 cap. A separate left-models run on 2026-11-09 has its own $10 cap and is not included in this $1.21 yet.</div></div>
     </div>
   </div>
 </div>
 
 <div class="tabbar" role="tablist" aria-label="Page sections"><div class="tab-scroll-hint" aria-hidden="true">Swipe tabs &#8250;</div>
   <div class="tabbar-in">
-    <button class="tab active" data-tab="benchmark" role="tab">Benchmark</button>
-    <button class="tab" data-tab="triage" role="tab">Live Triage</button>
-    <button class="tab" data-tab="models" role="tab">Models</button>
-    <button class="tab" data-tab="dataset" role="tab">Dataset</button>
+    <button class="tab active" data-tab="benchmark" role="tab" aria-selected="true">Benchmark</button>
+    <button class="tab" data-tab="triage" role="tab" aria-selected="false">Live Triage</button>
+    <button class="tab" data-tab="models" role="tab" aria-selected="false">Models</button>
+    <button class="tab" data-tab="dataset" role="tab" aria-selected="false">Dataset</button>
   </div>
 </div>
 
@@ -285,8 +299,8 @@ tr.unavail-row td{color:#a8a8a8}
       <p>Exact verified results from 2026-11-08 to 2026-11-09: 37 models attempted on the 50-finding v1 dataset, same prompt, temperature 0. 25 scored, 12 were unavailable and are flagged as unavailable with their HTTP error, never as zero scores. Click a column heading to sort, filter by status, or search by name. Use the toggles to show or hide a scored model in the charts.</p>
     </div>
     <div class="chiprow" id="lb-filters"><span class="lbl">Show</span>
-      <button class="toggle-chip lb-filter active" data-filter="all" type="button">All 34</button>
-      <button class="toggle-chip lb-filter" data-filter="scored" type="button">Scored 22</button>
+      <button class="toggle-chip lb-filter active" data-filter="all" type="button">All 37</button>
+      <button class="toggle-chip lb-filter" data-filter="scored" type="button">Scored 25</button>
       <button class="toggle-chip lb-filter" data-filter="unavailable" type="button">Unavailable 12</button>
       <input type="search" id="lb-search" placeholder="Search models..." aria-label="Search leaderboard models" style="font-family:var(--mono);font-size:12.5px;background:#000;border:1px solid var(--line-dark);color:#fff;padding:8px 12px;min-width:190px;border-radius:0">
       <span class="lbl" id="lb-count"></span>
@@ -309,7 +323,7 @@ tr.unavail-row td{color:#a8a8a8}
         <tbody id="lb-body"></tbody>
       </table>
     </div>
-    <p class="table-note">Unavailable means the model could not be run at all on 2026-11-08, verified by a direct single chat call for each one. Their dashes are not zero scores and they cost $0. The 404 responses and the 400 deprecated response are permanent. The 503 responses may be transient and are worth retrying later. Honest misses are kept: GLM-5.3-Flash called F17, a JWT test with a mock key, real when it was expected false positive. DeepSeek-V4.1-Flash returned no verdict on F07, a path-traversal check that stays inside the base directory, even after a 2500-token re-run, recorded as unparsed: its TP 25, FP 0, TN 24, FN 0 sums to 49 parsed answers, accuracy 49/50 = 0.980, precision, recall and F1 on the 49 parsed only. Total actually spent on scored runs: $1.156338 (2026-11-08 pass $0.696507 plus Batch 1-A 2026-11-09 $0.459831). Grand total for the whole project: about $1.21. Budget cap $5. Batch 1-A note: tencent/hy4 scored P/R/F1 1.000 on the 34 parsed answers only, accuracy 0.680 with 16 unparsed, and tencent/hy4-preview P 0.960 R 1.000 F1 0.980 accuracy 0.840 with 7 unparsed; their per-finding raw text and token usage were not in the log, so those fields are empty for the 3 Batch 1-A models.</p>
+    <p class="table-note">Rank is by accuracy, then by total cost, lowest cost first on a tie. Click a column heading to re-sort; the rank renumbers to the new sort. Unavailable means the model could not be run at all on 2026-11-08, verified by a direct single chat call for each one. Their dashes are not zero scores and they cost $0. The 404 responses and the 400 deprecated response are permanent. The 503 responses may be transient and are worth retrying later. Honest misses are kept: GLM-5.3-Flash called F17, a JWT test with a mock key, real when it was expected false positive. DeepSeek-V4.1-Flash returned no verdict on F07, a path-traversal check that stays inside the base directory, even after a 2500-token re-run, recorded as unparsed: its TP 25, FP 0, TN 24, FN 0 sums to 49 parsed answers, accuracy 49/50 = 0.980, precision, recall and F1 on the 49 parsed only. Total actually spent on scored runs: $1.156338 (2026-11-08 pass $0.696507 plus Batch 1-A 2026-11-09 $0.459831). Grand total for the whole project: about $1.21. Budget cap $5. Batch 1-A note: tencent/hy4 scored P/R/F1 1.000 on the 34 parsed answers only, accuracy 0.680 with 16 unparsed, and tencent/hy4-preview P 0.960 R 1.000 F1 0.980 accuracy 0.840 with 7 unparsed; their per-finding raw text and token usage were not in the log, so those fields are empty for the 3 Batch 1-A models.</p>
 
     <div class="takeaway">
       <h3>The short answer</h3>
@@ -318,8 +332,8 @@ tr.unavail-row td{color:#a8a8a8}
 
     <div class="dcard" style="margin-top:18px">
       <h3 style="font-size:19px;font-weight:600;margin-bottom:6px">What running every model would cost</h3>
-      <p style="font-family:var(--mono);font-size:13px;color:#c9c9c9;line-height:1.8;margin:0 0 14px">Running all 80 priced unique models on 50 findings costs <b style="color:var(--lime)">$73.53</b> on the safe basis (250 prompt + 2500 completion tokens per finding, 4550 prompt for openai/gpt-6.1-sol) and <b style="color:var(--lime)">$8.38</b> on the realistic basis (156 prompt + 246 completion tokens per finding, the observed means). gmicloud/Ripple-65B-Preview has no pricing and cannot be estimated. All 81 unique models do NOT fit in the $5 cap. The safe cumulative cost of the 4 original models plus the 30 cheapest untested was $4.886, under $5. The next cheapest untested model, Qwen/Qwen3.5-27B at a safe $0.304, would have pushed it to $5.19, so it was not run.</p>
-      <p style="font-family:var(--mono);font-size:13px;color:#c9c9c9;line-height:1.8;margin:0">44 models remain untested. Remaining total: safe $67.69, realistic $7.73. Cheapest remaining, safe cost for 50 findings: nvidia/nemotron-3-ultra-550b-a55b $0.335, stepfun-ai/Step-5-Preview $0.350, Qwen/Qwen3.6-Plus $0.381, Qwen/Qwen3.6-Plus-2026-04-02 $0.381, google/gemini-3-flash-preview $0.381. See all-models-under-10-plan.md in the repo: realistic $7.73 fits under $10, safe $67.69 does not, family-adjusted expected cost is about $12.41, two-stage is about $1.53.</p>
+      <p style="font-family:var(--mono);font-size:13px;color:#c9c9c9;line-height:1.8;margin:0 0 14px">Running all 80 priced unique models on 50 findings costs <b style="color:var(--lime)">$73.53</b> on the safe basis (250 prompt + 2500 completion tokens per finding, 4550 prompt for openai/gpt-6.1-sol) and <b style="color:var(--lime)">$8.38</b> on the realistic basis (156 prompt + 246 completion tokens per finding, the observed means). gmicloud/Ripple-65B-Preview has no pricing and cannot be estimated. All 81 unique models do NOT fit in the $5 cap. The safe cumulative cost of the 4 original models plus the 30 cheapest untested was $4.886, under $5. The next cheapest untested model at that time, Qwen/Qwen3.5-27B at a safe $0.304, would have pushed it to $5.19, so it was not run then. Batch 1-A on 2026-11-09 did run it, accuracy 0.940, cost $0.201537.</p>
+      <p style="font-family:var(--mono);font-size:13px;color:#c9c9c9;line-height:1.8;margin:0">44 models remained untested as of 2026-11-09 13:11 UTC. Remaining total then: safe $67.69, realistic $7.73. Cheapest remaining then, safe cost for 50 findings: nvidia/nemotron-3-ultra-550b-a55b $0.335, stepfun-ai/Step-5-Preview $0.350, Qwen/Qwen3.6-Plus $0.381, Qwen/Qwen3.6-Plus-2026-04-02 $0.381, google/gemini-3-flash-preview $0.381. A left-models run started 2026-11-09 13:14 UTC, $10 actual-spend cap, max_tokens 800, is testing those remaining models now, so this list will change. See all-models-under-10-plan.md in the repo: realistic $7.73 fits under $10, safe $67.69 does not, family-adjusted expected cost is about $12.41, two-stage is about $1.53.</p>
     </div>
 
     <div style="height:44px"></div>
@@ -329,7 +343,7 @@ tr.unavail-row td{color:#a8a8a8}
         <p class="sub">Precision, recall, F1 and accuracy for all 25 scored models. Scale runs from 0.70 to 1.00 so the gaps stay visible. Hover any bar for the exact value. Toggle models off above to focus.</p>
         <div class="legend"><span><i class="dot-sq" style="background:var(--lime)"></i>Precision</span><span><i class="dot-sq" style="background:var(--lime-dark)"></i>Recall</span><span><i class="dot-sq" style="background:#8a8a8a"></i>F1</span><span><i class="dot-sq" style="background:#e8e8e8"></i>Accuracy</span></div>
         <div id="chart-quality"></div>
-        <p class="axis-note">Seven models reached F1 0.980 or higher. The weakest precision was Gemini 3.1 Flash Lite Preview at 0.774, it called 7 false positives real. The weakest accuracy was 0.820, DeepSeek-V3-0324, with 5 unparsed answers.</p>
+        <p class="axis-note">Eleven models reached F1 0.980 or higher. The weakest precision was Gemini 3.1 Flash Lite Preview at 0.774, it called 7 false positives real. The weakest accuracy was 0.680, tencent/hy4, with 16 unparsed answers, so its precision, recall and F1 are on the 34 parsed answers only.</p>
       </div>
       <div class="dcard chart-panel">
         <h3>Cost vs accuracy tradeoff</h3>
@@ -522,7 +536,7 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
     <div class="sec-head">
       <p class="eyebrow"><span class="dot">&#9679;</span> Live Triage</p>
       <h2>Triage your own code, live</h2>
-      <p>Paste real code, a semgrep or osv-scanner finding, or a CVE description. Pick any of the 82 verified GMI models, or use Two-stage mode: pick a cheap Stage 1 model first, then any of the 82 models as Stage 2, only when Stage 1 is unsure. The default is Gemini 3.5 Flash Lite first, then GPT-6.1 Sol. The verdict comes straight from the GMI Inference API, called from your browser with your key. Two-stage added 2026-11-09, smoke-tested on 5 hardest findings.</p>
+      <p>Paste real code, a semgrep or osv-scanner finding, or a CVE description. Pick any of the 81 unique verified GMI models (82 entries, one duplicate), or use Two-stage mode: pick a cheap Stage 1 model first, then any of the 81 unique models as Stage 2, only when Stage 1 is unsure. The default is Gemini 3.5 Flash Lite first, then GPT-6.1 Sol. The verdict comes straight from the GMI Inference API, called from your browser with your key. Two-stage added 2026-11-09, smoke-tested on 5 hardest findings.</p>
     </div>
 
     <div class="keybox">
@@ -557,7 +571,7 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
               <select id="ts-stage1" aria-label="Stage 1 model"><option value="google/gemini-3.5-flash-lite" selected>google/gemini-3.5-flash-lite - accuracy 1.000, $0.000133/finding</option><option value="Qwen/Qwen3.8-Flash">Qwen/Qwen3.8-Flash - accuracy 1.000, $0.000157/finding</option><option value="XiaomiMiMo/MiMo-V2.6-Flash">XiaomiMiMo/MiMo-V2.6-Flash - accuracy 0.960, $0.000052/finding</option><option value="MiniMaxAI/MiniMax-M3">MiniMaxAI/MiniMax-M3 - accuracy 0.920, $0.000134/finding</option><option value="zai-org/GLM-5.3-Flash">zai-org/GLM-5.3-Flash - accuracy 0.980, $0.000207/finding</option><option value="deepseek-ai/DeepSeek-V3-0324">deepseek-ai/DeepSeek-V3-0324 - accuracy 0.820, $0.000073/finding</option><option value="google/gemini-3.1-flash-lite-preview">google/gemini-3.1-flash-lite-preview - accuracy 0.840, $0.000093/finding</option><option value="deepseek-ai/DeepSeek-V4-Flash">deepseek-ai/DeepSeek-V4-Flash - accuracy 0.920, $0.000104/finding</option><option value="deepseek-ai/DeepSeek-V3.2">deepseek-ai/DeepSeek-V3.2 - accuracy 0.940, $0.000181/finding</option><option value="MiniMaxAI/MiniMax-M3.1-Flash">MiniMaxAI/MiniMax-M3.1-Flash - accuracy 0.980, $0.000220/finding</option></select>
             </div>
             <div class="ts-field">
-              <label class="flabel" for="ts-stage2">Stage 2 model, only if escalated, all 82 models</label>
+              <label class="flabel" for="ts-stage2">Stage 2 model, only if escalated, all 81 unique models</label>
               <select id="ts-stage2" aria-label="Stage 2 model, all 82 GMI models"><option value="openai/gpt-6.1-sol" selected>openai/gpt-6.1-sol</option></select>
             </div>
           </div>
@@ -623,7 +637,7 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
 
         <div class="benchrun">
           <h3>Run the full benchmark yourself</h3>
-          <p class="small-note" style="margin-top:0">Runs all 50 dataset v1 findings against the model selected above, one call at a time, using your key. The estimate is a safe upper bound: this model's real per-token prices at 250 prompt tokens (4550 for openai/gpt-6.1-sol, the observed count) + 2500 completion tokens per finding. Completion is priced at max_tokens (2500), so the token count cannot exceed this basis. For reference, DeepSeek F07 actually used 2500 completion tokens and cost $0.00305. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Total project budget cap: $5. Nothing runs until you press Run.</p>
+          <p class="small-note" style="margin-top:0">Runs all 50 dataset v1 findings against the model selected above, one call at a time, using your key. The estimate is a safe upper bound: this model's real per-token prices at 250 prompt tokens (4550 for openai/gpt-6.1-sol, the observed count) + 2500 completion tokens per finding. Completion is priced at max_tokens (2500), so the token count cannot exceed this basis. For reference, DeepSeek F07 actually used 2500 completion tokens and cost $0.00305. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Original project budget cap: $5. A separate left-models run on 2026-11-09 has its own $10 actual-spend cap. Your own run here is charged to your GMI account, check the estimate above before pressing Run. Nothing runs until you press Run.</p>
           <div class="pricebox" id="bench-est"></div>
           <div class="capwarn" id="bench-capwarn">This estimate is at or over the $5 cap. Pick a cheaper model, or run it knowing your own GMI account will be charged roughly this amount.</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
@@ -644,16 +658,16 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow"><span class="dot">&#9679;</span> Models</p>
-      <h2>All 82 models, one recommender</h2>
+      <h2>All 81 unique models, one recommender</h2>
       <p>Every model below comes from the live list-models call verified on 2026-11-08, with its real per-token prices and context length. 25 models have measured scores from the 50-finding run, 12 attempted models were unavailable, and 1 more passed a smoke test. Everything else is labelled UNTESTED, with no invented scores. The docs example model meta-llama/Llama-3.3-70B-Instruct is not in the live list and is not offered here.</p>
     </div>
 
     <div class="grid2">
       <div class="wcard">
         <h3 style="font-size:19px;margin-bottom:6px">Model selector</h3>
-        <p style="font-family:var(--mono);font-size:12.5px;color:var(--ink2);margin:0 0 14px;line-height:1.7">Search all 82 models. Prices and estimates update instantly as you change the selection.</p>
+        <p style="font-family:var(--mono);font-size:12.5px;color:var(--ink2);margin:0 0 14px;line-height:1.7">Search all 81 unique models (82 entries, one duplicate). Prices and estimates update instantly as you change the selection.</p>
         <div class="field" style="margin-bottom:12px"><label for="model-search">Search models</label><input type="search" id="model-search" placeholder="Try qwen, gpt, deepseek, coder..." autocomplete="off"></div>
-        <select class="modelpick" id="model-pick" size="8" aria-label="All 82 GMI models"></select>
+        <select class="modelpick" id="model-pick" size="8" aria-label="All 81 unique GMI models"></select>
         <p class="table-note" id="model-count"></p>
         <div class="pricebox" id="model-price" style="background:#fbfbf5;border-color:var(--line-light);color:var(--ink)"></div>
         <div class="capwarn" id="model-capwarn">The estimated 50-finding cost for this model is high. The original project cap was $5 total, so check the estimate before running anything.</div>
@@ -739,7 +753,7 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
       </table>
     </div>
     <p class="table-note" id="ds-empty" style="display:none">No findings match those filters. Clear the search or pick a different category.</p>
-    <p class="table-note">48 of the 50 findings were judged correctly by all four models. Pick "Any miss" under Correctness to isolate F07 and F17.</p>
+    <p class="table-note">48 of the 50 findings were judged correctly by all four original models. Pick "Any miss" under Correctness to isolate F07 and F17.</p>
     <div style="height:44px"></div>
     <div class="sec-head" style="margin-bottom:22px">
       <p class="eyebrow"><span class="dot">&#9679;</span> Dataset v2, balanced, not run</p>
@@ -774,16 +788,16 @@ code{font-family:var(--mono);font-size:.9em;background:#f0f0e8;border:1px solid 
         <li>One label is contestable: F17, a JWT test that uses the mock secret 'test-secret', is labelled false positive because it is test code. A production reviewer could reasonably call it real, and GLM-5.3-Flash did. See the note on F17 in the Dataset viewer.</li>
         <li>A finding counts as real only if untrusted input actually reaches a dangerous sink with no effective mitigation in the code shown.</li>
         <li>The same prompt was used for every model. Each model had to return ONLY JSON, with a verdict of real or false_positive, plus severity and a reason.</li>
-        <li>Settings were identical for all models: temperature 0. The first pass used max_tokens 1000, the targeted re-run used 2500.</li>
+        <li>Settings were identical for all models in the 2026-11-08 pass and Batch 1-A: temperature 0. The first pass used max_tokens 1000, the targeted re-run used 2500. A separate left-models run started 2026-11-09 13:14 UTC uses max_tokens 800 and a $10 actual-spend cap, and its scores are not merged here until they are verified.</li>
       </ul></div>
       <div class="wcard"><h3 style="font-size:18px;margin-bottom:12px">Scoring and cost</h3><ul class="method-list">
         <li>34 models were attempted in the full pass on 2026-11-08: 22 scored, which is 1,100 model calls across the 50 findings, and 12 unavailable, each verified by a direct single chat call and recorded with its HTTP error at $0 cost. Batch 1-A on 2026-11-09 added 3 more scored models, Qwen/Qwen3.5-27B, tencent/hy4 and tencent/hy4-preview, 150 more calls, for $0.459831, bringing the total to 37 attempted, 25 scored, 1,250 calls.</li>
         <li>In the original 4-model run, five answers came back unparsed in the first pass. A re-run at 2500 tokens parsed 4 of the 5. Only F07 on DeepSeek stayed unparsed.</li>
-        <li>Scored runs actually cost $1.156338: the 2026-11-08 pass $0.696507 plus Batch 1-A $0.459831. The grand total for the whole project is about $1.21, still well under the $5 cap. Running all 80 priced models would cost a safe $73.53, so 44 models remain untested: remaining safe $67.69, realistic $7.73, family-adjusted expected about $12.41, two-stage about $1.53. See all-models-under-10-plan.md in the repo.</li>
+        <li>Scored runs actually cost $1.156338: the 2026-11-08 pass $0.696507 plus Batch 1-A $0.459831. The grand total for the whole project is about $1.21, still well under the $5 cap. Running all 80 priced models would cost a safe $73.53, so 44 models remained untested as of 2026-11-09 13:11 UTC: remaining safe $67.69, realistic $7.73, family-adjusted expected about $12.41, two-stage about $1.53. A left-models run started 2026-11-09 13:14 UTC is testing them now. See all-models-under-10-plan.md in the repo.</li>
         <li>DeepSeek denominator, stated explicitly: DeepSeek has 1 unparsed finding, F07. Its counts are TP 25, FP 0, TN 24, FN 0, which sum to 49 parsed answers. Its accuracy is 49/50 = 0.980, and its precision, recall and F1 are calculated on the 49 parsed answers only. The other three models have Unparsed: 0.</li>
         <li>Cost was calculated from the token usage returned by the API and the per-token prices in the live models list, not from estimates.</li>
         <li>Cost estimates on this page use a safe upper bound: 250 prompt tokens per finding (4550 for openai/gpt-6.1-sol, the observed provider-side count) plus 2500 completion tokens per finding. Completion is priced at max_tokens (2500), so a call's token count cannot exceed this basis. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Actual spend is usually far lower: the verified 50-finding run cost $0.051781 in total. DeepSeek F07 shows why the bound matters: it used the full 2500 completion tokens and cost $0.00305 for one finding.</li>
-        <li>Models were verified live on 2026-11-08 against a fresh list-models call, 82 models in total. The original 4-model run plus re-run cost $0.051781. The full 34-model pass cost $0.696507, Batch 1-A cost $0.459831, and the grand total for the whole project is about $1.21, under the $5 cap.</li>
+        <li>Models were verified live on 2026-11-08 against a fresh list-models call, 82 entries, 81 unique models in total. The original 4-model run plus re-run cost $0.051781. The full 34-model pass cost $0.696507, Batch 1-A cost $0.459831, and the grand total for the whole project is about $1.21, under the original $5 cap. A separate left-models run on 2026-11-09 has its own $10 cap.</li>
       </ul></div>
     </div>
     <div class="callout"><h3>Honest limitation</h3><p>The dataset is deliberately clear-cut, so perfect scores mean these models handle clear-cut cases well. They do not prove the same score on subtle, real-world code, where the line between a real vulnerability and a false positive is much harder to draw. That is exactly what the Live Triage tab is for: test the models on your own code.</p></div>
@@ -803,8 +817,8 @@ https://api.gmi-serving.com/v1/chat/completions</div>
   <div class="wrap">
     <p class="eyebrow"><span class="dot">&#9679;</span> Questions</p>
     <h2 style="font-size:clamp(30px,3.4vw,46px);font-weight:550;margin-bottom:26px">Before you run anything</h2>
-    <details><summary>Is my API key safe on this page?</summary><p>Your key stays in your browser. It is kept in sessionStorage for this tab only, never in localStorage, never logged, and the only request it is ever attached to goes directly from your browser to https://api.gmi-serving.com/v1. Press Clear key, or close the tab, and it is gone. Test Key calls GET /v1/models only, it does not run a chat call and costs nothing.</p></details>
-    <details><summary>How many models were run, and why not all 81?</summary><p>37 models were attempted in total: 25 scored on all 50 findings for $1.156338 in scored runs, and 12 were unavailable, each verified by a direct single chat call and shown with its HTTP error at $0 cost. Running all 80 priced unique models would cost a safe $73.53 (realistic $8.38), and gmicloud/Ripple-65B-Preview has no pricing, so all 81 do not fit in the $5 cap on the safe basis. 44 models remain untested and are listed with real prices, marked UNTESTED rather than given invented scores. On the realistic basis the remaining 43 priced models cost $7.73, which fits under $10, but actual costs run about 2.56x the realistic estimate, so the family-adjusted expected cost is about $12.41. Two-stage triage, Gemini Stage 1 plus 10 percent escalation, is about $1.53 for all 43. You can run any of them yourself from the Live Triage tab.</p></details>
+    <details><summary>Is my API key safe on this page?</summary><p>Your key stays in your browser. It is kept in sessionStorage for this tab only, never in localStorage, never logged, and the only request it is ever attached to goes directly from your browser to https://api.gmi-serving.com/v1. Press Clear key, or close the tab, and it is gone. Test Key calls GET /v1/models only, it does not run a chat call and costs nothing. This page loads Google Fonts, which sends your IP address to Google; there is no other analytics, no cookies, and no key logging on this page.</p></details>
+    <details><summary>How many models were run, and why not all 81?</summary><p>37 models were attempted in total: 25 scored on all 50 findings for $1.156338 in scored runs, and 12 were unavailable, each verified by a direct single chat call and shown with its HTTP error at $0 cost. Running all 80 priced unique models would cost a safe $73.53 (realistic $8.38), and gmicloud/Ripple-65B-Preview has no pricing, so all 81 do not fit in the $5 cap on the safe basis. 44 models remained untested as of 2026-11-09 13:11 UTC and are listed with real prices, marked UNTESTED rather than given invented scores. A left-models run started 2026-11-09 13:14 UTC is testing them now, its scores are not on this page yet. On the realistic basis the remaining 43 priced models cost $7.73, which fits under $10, but actual costs run about 2.56x the realistic estimate, so the family-adjusted expected cost is about $12.41. Two-stage triage, Gemini Stage 1 plus 10 percent escalation, is about $1.53 for all 43. You can run any of them yourself from the Live Triage tab.</p></details>
     <details><summary>What does it cost to run the benchmark myself?</summary><p>The Models tab and the Live Triage tab show a live safe upper-bound estimate for the selected model, for 1, 5 and 50 findings, from its real per-token prices. The basis is 250 prompt tokens (4550 for openai/gpt-6.1-sol, observed) plus 2500 completion tokens per finding, with completion priced at max_tokens, so token counts cannot exceed it. Safe upper bounds for 50 findings, verified 2026-11-08: GLM $0.064, DeepSeek $0.154, Qwen $0.061, Gemini $0.316, Sol $1.705, all five together $2.30, under the $5 cap. Actual costs are usually far lower, and the page warns you before you run an expensive model.</p></details>
     <details><summary>Does a perfect score mean a model is safe to trust?</summary><p>No. The dataset is deliberately clear-cut. Read the honest limitation in Methodology, then test the model on your own real findings in Live Triage before relying on it.</p></details>
     <details><summary>Test Key says "Network error". What is wrong?</summary><p>The API itself is reachable and CORS-open, and it answers a bad key with an "Invalid API key (401)" message, so a network error is not your key. It means the browser was stopped before any answer came back. The GMI API sits behind Cloudflare, which can reject in-app browsers and webviews by their browser signature, and a VPN, a content blocker, or a dropped mobile connection causes the same failure. Test Key and Live Triage retry once automatically and time out cleanly instead of spinning. If it still fails, open this page in a full browser (Chrome or Safari, not an in-app viewer), turn off any VPN or blocker, and try again.</p></details>
@@ -814,7 +828,7 @@ https://api.gmi-serving.com/v1/chat/completions</div>
 <div class="cta-lime">
   <div class="wrap">
     <h2>Triage your next finding with a model you picked yourself.</h2>
-    <p>Add your GMI key, choose from all 82 models, and get a verdict with severity, confidence and a suggested fix.</p>
+    <p>Add your GMI key, choose from all 81 unique models, and get a verdict with severity, confidence and a suggested fix.</p>
     <div style="display:flex;gap:14px;flex-wrap:wrap">
       <a class="btn btn-dark btn-lg" href="#triage">Run Live Triage &#8599;</a>
       <a class="btn btn-outline-dark btn-lg" href="#dataset">Browse the Dataset</a>
@@ -825,9 +839,9 @@ https://api.gmi-serving.com/v1/chat/completions</div>
 <footer>
   <div class="wrap">
     <div class="fgrid">
-      <div><h4>Security Model Benchmark</h4><p>Run on 2026-11-08 to 2026-11-09 &middot; GMI Cloud Inference Engine &middot; 50 findings &middot; 37 models attempted, 25 scored, 12 unavailable &middot; 82 models verified live. Scored runs $1.156338, grand total about $1.21, budget cap $5.</p></div>
+      <div><h4>Security Model Benchmark</h4><p>Run on 2026-11-08 to 2026-11-09 &middot; GMI Cloud Inference Engine &middot; 50 findings &middot; 37 models attempted, 25 scored, 12 unavailable &middot; 81 unique models verified live (82 entries, one duplicate). Scored runs $1.156338, grand total about $1.21, original budget cap $5. Leaderboard snapshot as of 2026-11-09 13:11 UTC. A left-models run is in progress, scores from it are not merged yet.</p></div>
       <div><h4>Sections</h4><ul><li><a href="#benchmark">Benchmark</a></li><li><a href="#triage">Live Triage</a></li><li><a href="#models">Models</a></li><li><a href="#dataset">Dataset</a></li></ul></div>
-      <div><h4>Notes</h4><p>Mobile layout uses standard responsive stacking and was not separately verified against the live GMI site. Untested models carry no scores on this page, only real prices.</p></div>
+      <div><h4>Notes</h4><p>Mobile layout: tabs scroll, leaderboard stacks into labelled rows, no page-wide sideways scroll. Untested models carry no scores on this page, only real prices. Report a mobile issue on GitHub.</p><p><a href="https://github.com/Jayanng/gmi-benchmark" style="color:var(--lime)">Source on GitHub</a> &middot; <a href="https://www.gmicloud.ai/" style="color:var(--lime)">GMI Cloud</a> &middot; <a href="https://docs.gmicloud.ai/" style="color:var(--lime)">GMI Docs</a></p></div>
     </div>
   </div>
 </footer>
@@ -903,6 +917,7 @@ function downloadJSON(obj,name){ var blob=new Blob([JSON.stringify(obj,null,2)],
 function showTab(name){
   document.querySelectorAll(".tabpanel").forEach(function(p){ p.hidden = p.getAttribute("data-panel")!==name; });
   document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t.getAttribute("data-tab")===name); });
+  document.querySelectorAll(".tab").forEach(function(t){ t.setAttribute("aria-selected", t.getAttribute("data-tab")===name ? "true" : "false"); });
   document.querySelectorAll("nav.main button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-goto")===name); });
 }
 document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click",function(){ showTab(t.getAttribute("data-tab")); document.getElementById(t.getAttribute("data-tab")).scrollIntoView({behavior:"smooth"}); }); });
@@ -915,7 +930,7 @@ function bindTip(el,text){ if(!el) return; el.addEventListener("mousemove",funct
 
 /* ---------- Leaderboard + charts with model toggles ---------- */
 var visible={}; SCORED.forEach(function(m){ visible[m.id]=true; });
-var sortKey="total", sortDir=1;
+var sortKey="accuracy", sortDir=-1;
 var lbFilter="all", lbQuery="";
 var togglesEl=document.getElementById("model-toggles");
 SCORED.forEach(function(m){
@@ -928,7 +943,7 @@ document.getElementById("lb-search").addEventListener("input",function(e){ lbQue
 function renderLeaderboard(){
   var scored=SCORED.filter(function(m){ return (lbFilter!=="unavailable") && (!lbQuery || m.id.toLowerCase().indexOf(lbQuery)!==-1); });
   var unav=UNAVAIL.filter(function(m){ return (lbFilter!=="scored") && (!lbQuery || m.id.toLowerCase().indexOf(lbQuery)!==-1); });
-  scored.sort(function(a,b){ var av=a[sortKey==="model"?"id":sortKey], bv=b[sortKey==="model"?"id":sortKey]; if(typeof av==="string") return sortDir*av.localeCompare(bv); return sortDir*(av-bv); });
+  scored.sort(function(a,b){ var av=a[sortKey==="model"?"id":sortKey], bv=b[sortKey==="model"?"id":sortKey]; var cmp; if(typeof av==="string") cmp=av.localeCompare(bv); else cmp=av-bv; if(cmp!==0) return sortDir*cmp; if(a.accuracy!==b.accuracy) return b.accuracy-a.accuracy; return a.total-b.total; });
   unav.sort(function(a,b){ return a.id.localeCompare(b.id); });
   var html="";
   scored.forEach(function(m,i){
@@ -1078,7 +1093,7 @@ var REC={
  accuracy:{id:"google/gemini-3.5-flash-lite",why:"Three of the 25 scored models reached a perfect accuracy of 1.000 on all 50 findings: google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash and deepseek-ai/deepseek-v4-flash-vision-exp. Gemini gets the pick because it matched that perfect score at the lowest cost of the three, $0.006663 total, and it is also the best value overall."},
  fastest:{id:"MiniMaxAI/MiniMax-M3",why:"Fastest verified average latency among the 25 scored models: MiniMaxAI/MiniMax-M3 at 1.64s per finding, accuracy 0.920. The fastest perfect model is google/gemini-3.5-flash-lite at 2.87s per finding with accuracy 1.000, so pick M3 for raw speed and Gemini when the verdict has to be right."},
  cheapest:{id:"XiaomiMiMo/MiMo-V2.6-Flash",why:"Cheapest verified scored run: XiaomiMiMo/MiMo-V2.6-Flash cost $0.002579 in total for all 50 findings, $0.000052 per finding, with accuracy 0.960 and F1 0.962. If you need perfect accuracy instead, google/gemini-3.5-flash-lite is the best value at $0.006663 total."},
- value:{id:"google/gemini-3.5-flash-lite",why:"Best value is accuracy per dollar, and Gemini leads on both sides of that trade: accuracy 1.000 at the lowest cost per finding, $0.000133, and the lowest latency. Qwen3.8-Flash is the runner-up, also perfect, at $0.000157 per finding."},
+ value:{id:"google/gemini-3.5-flash-lite",why:"Best value is accuracy per dollar, and Gemini leads on both sides of that trade: accuracy 1.000 at the lowest cost per finding, $0.000133, and the lowest latency of the three perfect models, 2.87s per finding. Qwen3.8-Flash is the runner-up, also perfect, at $0.000157 per finding."},
  coding:{id:"Qwen/Qwen3.8-Flash",why:"Best for coding and security triage, scored only: Qwen/Qwen3.8-Flash was perfect, 50 of 50, accuracy 1.000, precision 1.000, recall 1.000, at $0.000157 per finding, $0.007836 for all 50. The specialist coder model Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8 is UNTESTED on this dataset, so it is not a recommender pick. It is listed under Worth testing next below."},
  strongest:{id:"google/gemini-3.5-flash-lite",why:"Strongest overall, scored only: google/gemini-3.5-flash-lite was perfect, 50 of 50, accuracy 1.000, at the lowest cost of the three perfect models, $0.000133 per finding, $0.006663 for all 50, and the fastest of the three at 2.87s. openai/gpt-6.1-sol is NOT a recommender pick: it passed only a 5-finding smoke test, not a full benchmark, at $0.009372 per finding, and in the 2026-11-09 two-stage smoke test 3 of its 5 solo calls returned HTTP 503 no eligible worker. It is listed under Worth testing next below."}
 };
