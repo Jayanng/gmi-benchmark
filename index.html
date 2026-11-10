@@ -1344,7 +1344,7 @@ document.getElementById("repo-run").addEventListener("click",function(){
         }
         return {findings:findings,res:res,cost:cost,retried:false,retryCost:0,retrySkippedReasoning:false,retryTimedOut:false};
       }
-      return afterFirst().then(function(out){
+      return Promise.resolve(afterFirst()).then(function(out){
         findings=out.findings; res=out.res; cost=out.cost;
         var usage=res.json.usage||{};
         if(findings==null){ errorFiles++; fileResults.push({file:f.name,error:"unparsed",unparsed:true,retried:out.retried,retrySkippedReasoning:!!out.retrySkippedReasoning,retryTimedOut:!!out.retryTimedOut,reasoning_tokens:reasoningTokensOf(usage),usage:usage,cost_usd:Math.round(cost*1000000)/1000000}); }
