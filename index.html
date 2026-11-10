@@ -396,7 +396,7 @@ footer a:hover{color:var(--lime)}
     <div class="sec-head">
       <p class="eyebrow"><span class="dot">&#9679;</span> Repo audit</p>
       <h2>Audit a whole repo, file by file</h2>
-      <p>Paste files, fetch a public GitHub repo, or upload a zip. Pick the checks you care about, pick a model, and each file is audited on its own. A finding is only reported if the model finds it in the code shown: nothing is invented, and a file with no findings says so plainly. Repo audit uses max_tokens 2500 by default, and retries once with a shorter prompt if a model returns no JSON. If a file still comes back unparsed, it is shown as no verdict, not as clean: reasoning models can spend all their completion tokens reasoning and return nothing.</p>
+      <p>Paste files, fetch a public GitHub repo, or upload a zip. Pick the checks you care about, pick a model, and each file is audited on its own. A finding is only reported if the model finds it in the code shown: nothing is invented, and a file with no findings says so plainly. Repo audit uses max_tokens 2500 by default. For most models it retries once with a shorter prompt if a model returns no JSON, but it does NOT retry reasoning-heavy models: in testing on 2026-11-10, deepseek-ai/deepseek-v4.1-flash-1017 spent all 2500 completion tokens reasoning on run_benchmark.py twice, $0.008521 in total, and returned empty JSON both times. A retry would only spend another $0.004247 to fail the same way. If a file still comes back unparsed, it is shown as no verdict, not as clean: reasoning models can spend all their completion tokens reasoning and return nothing. No model is pre-selected here: pick one before the audit button unlocks.</p>
     </div>
 
     <div class="wcard" style="margin-bottom:18px">
@@ -625,12 +625,32 @@ function downloadJSON(obj,name){ downloadText(JSON.stringify(obj,null,2),name,"a
 var keyInput=document.getElementById("api-key"), keyStatus=document.getElementById("key-status");
 function getKey(){ try{ return sessionStorage.getItem("gmi_api_key")||""; }catch(e){ return ""; } }
 function setKey(v){ try{ if(v) sessionStorage.setItem("gmi_api_key",v); else sessionStorage.removeItem("gmi_api_key"); }catch(e){} refreshKeyUI(); }
+function modelChosenForMode(){
+  if(auditMode==="single") return !!triModel.value;
+  if(auditMode==="compare") return !!cmpA.value && !!cmpB.value && cmpA.value!==cmpB.value;
+  if(auditMode==="two-stage") return !!tsStage1.value && !!tsStage2.value;
+  return !!triModel.value;
+}
+function updateRunButtons(){
+  var hasKey=!!getKey();
+  document.getElementById("triage-run").disabled=!(hasKey && modelChosenForMode());
+  document.getElementById("repo-run").disabled=!(hasKey && !!repoModel.value);
+  document.getElementById("triage-nokey").style.display=(hasKey && modelChosenForMode())?"none":"block";
+  document.getElementById("repo-nokey").style.display=(hasKey && !!repoModel.value)?"none":"block";
+  if(!hasKey){
+    document.getElementById("triage-nokey").textContent="Add your GMI API key above first, then pick a model, and this button unlocks. Nothing is sent anywhere until you press it.";
+    document.getElementById("repo-nokey").textContent="Add your GMI API key in the audit section above first, then pick a model. Repo audit uses the same key, from the same tab session.";
+  } else if(!modelChosenForMode()){
+    document.getElementById("triage-nokey").textContent="Pick a model first. No model is pre-selected: choose one above and this button unlocks.";
+  }
+  if(!hasKey){
+  } else if(!repoModel.value){
+    document.getElementById("repo-nokey").textContent="Pick a model for the repo audit first. No model is pre-selected.";
+  }
+}
 function refreshKeyUI(){
   var has=!!getKey();
-  document.getElementById("triage-run").disabled=!has;
-  document.getElementById("repo-run").disabled=!has;
-  document.getElementById("triage-nokey").style.display=has?"none":"block";
-  document.getElementById("repo-nokey").style.display=has?"none":"block";
+  updateRunButtons();
   if(has&&keyStatus.className.indexOf("ok")===-1){ keyStatus.className="keystatus ok"; keyStatus.textContent="Key saved for this tab session. Audits are enabled."; }
   if(!has){ keyStatus.className="keystatus dim"; keyStatus.textContent="No key entered yet. Add your key to enable the audit."; }
 }
@@ -679,6 +699,7 @@ function modelOptions(filter, includeNone){
   var list=ALL_MODELS.filter(function(m){ return !filter || m.id.toLowerCase().indexOf(filter.toLowerCase())!==-1; });
   var html="";
   if(includeNone) html+="<option value=''>None</option>";
+  else html+="<option value='' selected>Select a model</option>";
   html+=list.map(function(m){ return "<option value='"+m.id+"'>"+m.id+"</option>"; }).join("");
   return html;
 }
@@ -690,23 +711,21 @@ var tsStage1=document.getElementById("ts-stage1"), tsStage2=document.getElementB
 function fillStage1(){
   var cheap=CHEAP_STAGE1.filter(function(id){ return byId(id); });
   var rest=ALL_MODELS.filter(function(m){ return CHEAP_STAGE1.indexOf(m.id)===-1; });
-  tsStage1.innerHTML="<optgroup label='Low-cost first pass'>"+cheap.map(function(id){ return "<option value='"+id+"'>"+id+"</option>"; }).join("")+"</optgroup><optgroup label='All models'>"+rest.map(function(m){ return "<option value='"+m.id+"'>"+m.id+"</option>"; }).join("")+"</optgroup>";
+  tsStage1.innerHTML="<option value='' selected>Select a model</option><optgroup label='Low-cost first pass'>"+cheap.map(function(id){ return "<option value='"+id+"'>"+id+"</option>"; }).join("")+"</optgroup><optgroup label='All models'>"+rest.map(function(m){ return "<option value='"+m.id+"'>"+m.id+"</option>"; }).join("")+"</optgroup>";
 }
-fillSelect(triModel,"",false); triModel.value="google/gemini-3.5-flash-lite";
-fillSelect(cmpA,"",false); cmpA.value="google/gemini-3.5-flash-lite";
-fillSelect(cmpB,"",false); cmpB.value="Qwen/Qwen3.8-Flash";
+fillSelect(triModel,"",false); triModel.value="";
+fillSelect(cmpA,"",false); cmpA.value="";
+fillSelect(cmpB,"",false); cmpB.value="";
 fillSelect(cmpC,"",true); cmpC.value="";
-fillSelect(repoModel,"",false); repoModel.value="google/gemini-3.5-flash-lite";
-fillStage1(); tsStage1.value="google/gemini-3.5-flash-lite";
-fillSelect(tsStage2,"",false); tsStage2.value="openai/gpt-6.1-sol";
+fillSelect(repoModel,"",false); repoModel.value="";
+fillStage1(); tsStage1.value="";
+fillSelect(tsStage2,"",false); tsStage2.value="";
 document.getElementById("model-search").addEventListener("input",function(e){
   var f=e.target.value.trim(); fillSelect(triModel,f,false);
-  if(!triModel.value && triModel.options.length) triModel.selectedIndex=0;
-  updateEstimates();
+  updateEstimates(); updateRunButtons();
 });
-function syncRepoModel(id){ if(byId(id)){ repoModel.value=id; updateEstimates(); } }
-triModel.addEventListener("change",function(){ syncRepoModel(triModel.value); updateEstimates(); });
-[triModel,cmpA,cmpB,cmpC,tsStage1,tsStage2,repoModel].forEach(function(el){ el.addEventListener("change",updateEstimates); });
+triModel.addEventListener("change",function(){ updateEstimates(); updateRunButtons(); });
+[triModel,cmpA,cmpB,cmpC,tsStage1,tsStage2,repoModel].forEach(function(el){ el.addEventListener("change",function(){ updateEstimates(); updateRunButtons(); }); });
 
 /* ---------- Cost estimates, before you run ---------- */
 function inputText(){ return document.getElementById("triage-input").value; }
@@ -715,33 +734,34 @@ function updateEstimates(){
   var mt = auditMode==="two-stage" ? tsMaxTokens() : 2500;
   var single=document.getElementById("triage-model").value;
   var pr=priceOf(byId(single));
-  document.getElementById("triage-price").innerHTML="<b>"+esc(single)+"</b><br>Prompt "+(pr?money(pr.p):"n/a")+" / token &middot; Completion "+(pr?money(pr.c):"n/a")+" / token<br>"+costLine(single,text,2500)+"<br><span style='opacity:.75'>Estimate basis: prompt tokens from your input length (about 4 characters per token) plus 150 for the prompt itself, typical completion 250 tokens, maximum completion at max_tokens. The real token counts come back from the API with the verdict.</span>";
-  var models=[cmpA.value,cmpB.value].concat(cmpC.value?[cmpC.value]:[]);
+  document.getElementById("triage-price").innerHTML=single?("<b>"+esc(single)+"</b><br>Prompt "+(pr?money(pr.p):"n/a")+" / token &middot; Completion "+(pr?money(pr.c):"n/a")+" / token<br>"+costLine(single,text,2500)+"<br><span style='opacity:.75'>Estimate basis: prompt tokens from your input length (about 4 characters per token) plus 150 for the prompt itself, typical completion 250 tokens, maximum completion at max_tokens. The real token counts come back from the API with the verdict.</span>"):("No model selected yet. Pick a model above: the cost estimate appears here once you choose one. No model is pre-selected.");
+  var models=[cmpA.value,cmpB.value].concat(cmpC.value?[cmpC.value]:[]).filter(function(id){ return !!id; });
   var totT=0, totM=0, unknown=false;
   models.forEach(function(id){ var t=typicalCost(id,text,2500), m=maxCost(id,text,2500); if(t==null){ unknown=true; } else { totT+=t; totM+=m; } });
-  document.getElementById("compare-price").innerHTML="<b>"+models.length+" models:</b> "+models.map(function(id){ return esc(id); }).join(" &middot; ")+"<br>"+(unknown?"One model has no per-token price, so the total cannot be calculated.":"Typical total <b>"+money(totT)+"</b> &middot; Max total <b>"+money(totM)+"</b> at max_tokens 2500")+"<br><span style='opacity:.75'>Each model is charged separately on your GMI account.</span>";
+  document.getElementById("compare-price").innerHTML=models.length?("<b>"+models.length+" models:</b> "+models.map(function(id){ return esc(id); }).join(" &middot; ")+"<br>"+(unknown?"One model has no per-token price, so the total cannot be calculated.":"Typical total <b>"+money(totT)+"</b> &middot; Max total <b>"+money(totM)+"</b> at max_tokens 2500")+"<br><span style='opacity:.75'>Each model is charged separately on your GMI account.</span>"):("Pick two models to compare, A and B, and optionally a third. No model is pre-selected.");
   updateTwoStageEstimate();
   var est=document.getElementById("run-estimate");
   if(auditMode==="single"){
-    est.innerHTML="Cost for this audit, <b>"+esc(single)+"</b>: "+costLine(single,text,2500)+". <span class='free'>We spend $0.</span> Your GMI account is charged, at that model real per-token prices.";
+    est.innerHTML=single?("Cost for this audit, <b>"+esc(single)+"</b>: "+costLine(single,text,2500)+". <span class='free'>We spend $0.</span> Your GMI account is charged, at that model real per-token prices."):"Select a model first. No model is pre-selected.";
   } else if(auditMode==="compare"){
-    est.innerHTML="Cost for this audit, <b>"+models.length+" models</b>: "+(unknown?"unknown for one model, see above.":"typical total <b>"+money(totT)+"</b>, max total <b>"+money(totM)+"</b>.")+" <span class='free'>We spend $0.</span> Your GMI account is charged.";
+    est.innerHTML=(cmpA.value&&cmpB.value)?("Cost for this audit, <b>"+models.length+" models</b>: "+(unknown?"unknown for one model, see above.":"typical total <b>"+money(totT)+"</b>, max total <b>"+money(totM)+"</b>.")+" <span class='free'>We spend $0.</span> Your GMI account is charged."):"Pick two different models to compare first. No model is pre-selected.";
   } else {
     var c1=typicalCost(tsStage1Model(),text,tsMaxTokens()), c1m=maxCost(tsStage1Model(),text,tsMaxTokens());
     var c2=typicalCost(tsStage2Model(),text,tsMaxTokens()), c2m=maxCost(tsStage2Model(),text,tsMaxTokens());
-    est.innerHTML="Cost for this audit, two-stage: Stage 1 <b>"+esc(tsStage1Model())+"</b> "+(c1==null?"unknown":("typical <b>"+money(c1)+"</b>, max <b>"+money(c1m)+"</b>"))+(c2==null?"":" plus Stage 2 <b>"+esc(tsStage2Model())+"</b> typical <b>"+money(c2)+"</b>, max <b>"+money(c2m)+"</b> only if escalated")+". <span class='free'>We spend $0.</span> Your GMI account is charged.";
+    est.innerHTML=(tsStage1Model()&&tsStage2Model())?("Cost for this audit, two-stage: Stage 1 <b>"+esc(tsStage1Model())+"</b> "+(c1==null?"unknown":("typical <b>"+money(c1)+"</b>, max <b>"+money(c1m)+"</b>"))+(c2==null?"":" plus Stage 2 <b>"+esc(tsStage2Model())+"</b> typical <b>"+money(c2)+"</b>, max <b>"+money(c2m)+"</b> only if escalated")+". <span class='free'>We spend $0.</span> Your GMI account is charged."):"Pick a Stage 1 model and a Stage 2 model first. No model is pre-selected.";
   }
 }
 function tsThreshold(){ var el=document.getElementById("ts-threshold"); return el?parseFloat(el.value):0.8; }
 function tsMaxTokens(){ var el=document.getElementById("ts-max-tokens"); return el?parseInt(el.value,10):800; }
-function tsStage1Model(){ return tsStage1.value||"google/gemini-3.5-flash-lite"; }
-function tsStage2Model(){ return tsStage2.value||"openai/gpt-6.1-sol"; }
+function tsStage1Model(){ return tsStage1.value||""; }
+function tsStage2Model(){ return tsStage2.value||""; }
 function updateTwoStageEstimate(){
   var el=document.getElementById("ts-estimate"); if(!el) return;
   var text=inputText(), mt=tsMaxTokens();
   var s1m=tsStage1Model(), s2m=tsStage2Model();
   var c1=typicalCost(s1m,text,mt), c1m=maxCost(s1m,text,mt);
   var c2=typicalCost(s2m,text,mt), c2m=maxCost(s2m,text,mt);
+  if(!s1m||!s2m){ el.innerHTML="Pick a Stage 1 model and a Stage 2 model first. No model is pre-selected."; return; }
   if(c1==null||c2==null){ el.innerHTML="Two-stage estimate: cost unknown for "+esc(c1==null?s1m:s2m)+", that model has no pricing in the live list."; return; }
   el.innerHTML="Two-stage estimate at max_tokens "+mt+": Stage 1 <b>"+esc(s1m)+"</b> typical "+money(c1)+", max "+money(c1m)+" &middot; Stage 2 <b>"+esc(s2m)+"</b> typical "+money(c2)+", max "+money(c2m)+" per call, only if escalated. 1 finding: <b>"+money(c1)+"</b> typical if Stage 1 settles it, <b>"+money(c1+c2)+"</b> typical if escalated.";
 }
@@ -756,7 +776,7 @@ function setAuditMode(mode){
   document.getElementById("single-panel").style.display=mode==="single"?"block":"none";
   document.getElementById("compare-panel").style.display=mode==="compare"?"block":"none";
   document.getElementById("two-stage-panel").style.display=mode==="two-stage"?"block":"none";
-  updateEstimates();
+  updateEstimates(); updateRunButtons();
 }
 document.getElementById("mode-single").addEventListener("click",function(){ setAuditMode("single"); });
 document.getElementById("mode-compare").addEventListener("click",function(){ setAuditMode("compare"); });
@@ -833,7 +853,8 @@ function verdictPlainText(r){
 
 /* ---------- Compare mode ---------- */
 function runCompare(key,text,btn){
-  var models=[cmpA.value,cmpB.value].concat(cmpC.value?[cmpC.value]:[]);
+  var models=[cmpA.value,cmpB.value].concat(cmpC.value?[cmpC.value]:[]).filter(function(id){ return !!id; });
+  if(models.length<2){ showTriageError("Select two different models to compare first. No model is pre-selected."); return; }
   if(models[0]===models[1]||(models[2]&&models[2]===models[0])||(models[2]&&models[2]===models[1])){ showTriageError("Pick different models to compare. Two slots hold the same model right now."); return; }
   btn.disabled=true; btn.innerHTML="<span class='spin'></span>Auditing with "+models.length+" models...";
   var prog=document.getElementById("triage-progress"); prog.style.display="block"; prog.className="progress indet";
@@ -878,7 +899,7 @@ function runCompare(key,text,btn){
     document.getElementById("verdict-empty").textContent="No verdict yet.";
     showTriageError("The comparison failed before any model answered. Nothing was invented. Try again.");
   }).then(function(){
-    btn.disabled=!getKey(); btn.textContent="Audit This Finding \u2197";
+    updateRunButtons(); btn.textContent="Audit This Finding \u2197";
     prog.style.display="none"; prog.className="progress";
   });
 }
@@ -893,6 +914,7 @@ function stageLine(label,model,res,parsed){
 function runTwoStage(key,text,btn){
   var threshold=tsThreshold(), mt=tsMaxTokens();
   var S1=tsStage1Model(), S2=tsStage2Model();
+  if(!S1||!S2){ showTriageError("Select a Stage 1 model and a Stage 2 model first. No model is pre-selected."); return; }
   btn.disabled=true; btn.innerHTML="<span class='spin'></span>Stage 1: "+S1+"...";
   var prog=document.getElementById("triage-progress"); prog.style.display="block"; prog.className="progress indet";
   document.getElementById("verdict-out").style.display="none"; document.getElementById("compare-out").style.display="none";
@@ -941,7 +963,7 @@ function runTwoStage(key,text,btn){
     document.getElementById("verdict-empty").textContent="No verdict yet.";
     showTriageError(e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90)+" No verdict was produced.":networkErrorText()+" No verdict was produced."));
   }).then(function(){
-    btn.disabled=!getKey(); btn.textContent="Audit This Finding \u2197";
+    updateRunButtons(); btn.textContent="Audit This Finding \u2197";
     prog.style.display="none"; prog.className="progress";
   });
 }
@@ -952,6 +974,7 @@ document.getElementById("triage-run").addEventListener("click",function(){
   hideTriageError();
   if(!key){ showTriageError("Add your GMI API key first. The audit button stays disabled until a key is entered."); return; }
   if(!text){ showTriageError("Paste a code snippet, a semgrep or osv finding, or a CVE description first."); return; }
+  if(!modelChosenForMode()){ showTriageError("Select a model first. No model is pre-selected: pick one above, then press Audit This Finding."); return; }
   if(auditMode==="compare"){ runCompare(key,text,this); return; }
   if(auditMode==="two-stage"){ runTwoStage(key,text,this); return; }
   var btn=this; btn.disabled=true; btn.innerHTML="<span class='spin'></span>Calling GMI API...";
@@ -966,7 +989,7 @@ document.getElementById("triage-run").addEventListener("click",function(){
     document.getElementById("verdict-empty").textContent="No verdict yet.";
     showTriageError(e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90)+" No verdict was produced.":networkErrorText()+" No verdict was produced."));
   }).then(function(){
-    btn.disabled=!getKey(); btn.textContent="Audit This Finding \u2197";
+    updateRunButtons(); btn.textContent="Audit This Finding \u2197";
     prog.style.display="none"; prog.className="progress";
   });
 });
@@ -1018,6 +1041,7 @@ function updateRepoEstimate(){
   var files=collectPasteFiles().concat(collectRepoFiles());
   var model=repoModel.value;
   var el=document.getElementById("repo-estimate");
+  if(!model){ el.innerHTML="No model selected yet. Pick a model for the repo audit first: the estimate appears here once you choose one. No model is pre-selected."; updateRunButtons(); return; }
   if(!files.length){ el.innerHTML="No files yet. Add files above to see the estimate."; return; }
   var over=files.filter(function(f){ return (f.content||"").length>MAX_FILE_BYTES; });
   var notFetched=files.filter(function(f){ return f.content==null; });
@@ -1030,14 +1054,15 @@ function updateRepoEstimate(){
   });
   var largestPrompt=Math.max.apply(null, runFiles.map(function(f){ return estPromptTokens(f.content); }).concat([0]));
   var reasoningWarn=isReasoningModel(model);
+  var warn="";
   if(largestPrompt>3000||reasoningWarn){
     var wmsg="<br><b>Warning:</b> ";
     if(largestPrompt>3000) wmsg+="largest file is about "+largestPrompt.toLocaleString()+" prompt tokens. ";
     if(reasoningWarn) wmsg+="This is a reasoning-heavy model (DeepSeek / thinking / R1). It can spend all of its completion tokens reasoning and return no JSON at all. ";
-    wmsg+="Repo audit now uses max_tokens 2500 by default, which gives the model room to reason and still return JSON. If a file still comes back unparsed, retry it with google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash or XiaomiMiMo/MiMo-V2.6-Flash, which parsed reliably in the 50-finding test, 0 unparsed on Gemini and Qwen.";
+    if(largestPrompt>3000&&reasoningWarn) wmsg+="Tested 2026-11-10: deepseek-ai/deepseek-v4.1-flash-1017 spent all 2500 completion tokens reasoning on run_benchmark.py twice, $0.008521 in total, and returned empty JSON both times. Do not use a reasoning-heavy model for a large file like this. No retry is made for reasoning-heavy models, because a retry costs another $0.004247 and failed the same way in testing. ";
+    wmsg+="Repo audit uses max_tokens 2500. If a file still comes back unparsed, try it again with a model you choose yourself: google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash or XiaomiMiMo/MiMo-V2.6-Flash parsed reliably in the 50-finding test, 0 unparsed on Gemini and Qwen. None of them is pre-selected here, you choose.";
     warn+=wmsg;
   }
-  var warn="";
   if(files.length>MAX_FILES) warn+="<br>Only the first "+MAX_FILES+" files will run.";
   if(notFetched.length) warn+="<br>"+notFetched.length+" file(s) not fetched yet: tick a file to fetch its contents, or press Audit These Files and they are fetched first.";
   if(over.length) warn+="<br>"+over.length+" file(s) over 40 KB will be skipped: "+over.map(function(f){ return esc(f.name); }).join(", ");
@@ -1247,6 +1272,7 @@ function parseRepoFindings(j){
 document.getElementById("repo-stop").addEventListener("click",function(){ repoStop=true; });
 document.getElementById("repo-run").addEventListener("click",function(){
   var key=getKey(); if(!key) return;
+  if(!repoModel.value){ toast("Select a model for the repo audit first. No model is pre-selected."); return; }
   var checks=selectedChecks();
   if(!checks.length){ toast("Tick at least one check first"); return; }
   var files=collectPasteFiles().concat(collectRepoFiles());
@@ -1263,7 +1289,7 @@ document.getElementById("repo-run").addEventListener("click",function(){
   Promise.all(unfetched.map(function(f){ return fetchGhFileContent(f,window._ghParsed,window._ghBranch); })).then(function(){
     var skipped=files.filter(function(f){ return f.content==null||(f.content||"").length>MAX_FILE_BYTES; });
     files=files.filter(function(f){ return f.content!=null&&(f.content||"").length<=MAX_FILE_BYTES; }).slice(0,MAX_FILES);
-    if(!files.length){ btn.disabled=!getKey(); stopBtn.style.display="none"; prog.style.display="none"; status.textContent="No files could be fetched to audit. "+(skipped.length?skipped.length+" file(s) failed to fetch or are over 40 KB. ":"")+"Check the GitHub token note above, or paste the files instead."; return; }
+    if(!files.length){ updateRunButtons(); stopBtn.style.display="none"; prog.style.display="none"; status.textContent="No files could be fetched to audit. "+(skipped.length?skipped.length+" file(s) failed to fetch or are over 40 KB. ":"")+"Check the GitHub token note above, or paste the files instead."; return; }
     startAudit(files,skipped);
   });
   function startAudit(files,skipped){
@@ -1275,34 +1301,37 @@ document.getElementById("repo-run").addEventListener("click",function(){
     status.innerHTML="<span class='spin'></span>Auditing "+esc(f.name)+" ("+(i+1)+" of "+files.length+") with "+esc(model)+"...";
     var prompt=REPO_PROMPT+checks.join(", ")+"\n\n";
     var fileText="File: "+f.name+"\n```\n"+f.content+"\n```";
-    /* First call at max_tokens 2500. Reasoning models can spend all 800 tokens reasoning and return no JSON, which is exactly what happened to run_benchmark.py on deepseek-v4.1-flash-1017 (4246 prompt, 800 completion, 800 reasoning, $0.002234, unparsed). One automatic retry, with a shorter prompt, is charged as a second call. */
+    /* First call at max_tokens 2500. Reasoning models can spend all their completion tokens reasoning and return no JSON, which is exactly what happened to run_benchmark.py on deepseek-v4.1-flash-1017 (4246 prompt, 800 completion, 800 reasoning, $0.002234, unparsed at 800; then 2500 completion, 2500 reasoning, empty, twice, $0.008521). One automatic retry, with a shorter prompt, is charged as a second call, but it is NOT made for reasoning-heavy models: the retry costs another $0.004247 and failed the same way in testing. A timeout is treated as unparsed, no verdict, not as a crash. */
     callGMIWithTokens(key,model,fileText,REPO_MAX_TOKENS,prompt).then(function(res){
       var findings=parseRepoFindings(res.json);
       var cost=costFromUsage(res.json.usage||{},model); totalCost+=cost;
-      var retried=false, retryCost=0, retryRes=null;
+      var retried=false, retryCost=0, retryRes=null, retrySkippedReasoning=false, retryTimedOut=false;
       function afterFirst(){
         if(findings==null&&!retried){
+          if(isReasoningModel(model)){ retrySkippedReasoning=true; return {findings:null,res:res,cost:cost,retried:false,retryCost:0,retrySkippedReasoning:true,retryTimedOut:false}; }
           retried=true;
           var shortPrompt=REPO_PROMPT_SHORT+checks.join(", ")+"\n\n";
           return callGMIWithTokens(key,model,fileText,REPO_MAX_TOKENS,shortPrompt).then(function(r2){
             retryRes=r2; retryCost=costFromUsage(r2.json.usage||{},model); totalCost+=retryCost;
             findings=parseRepoFindings(r2.json);
-            return {findings:findings,res:retryRes,cost:cost+retryCost,retried:true,retryCost:retryCost};
-          }).catch(function(){ return {findings:null,res:res,cost:cost,retried:true,retryCost:0}; });
+            return {findings:findings,res:retryRes,cost:cost+retryCost,retried:true,retryCost:retryCost,retrySkippedReasoning:false,retryTimedOut:false};
+          }).catch(function(e){ if(e&&e.timeout) retryTimedOut=true; return {findings:null,res:res,cost:cost,retried:true,retryCost:0,retrySkippedReasoning:false,retryTimedOut:retryTimedOut}; });
         }
-        return {findings:findings,res:res,cost:cost,retried:false,retryCost:0};
+        return {findings:findings,res:res,cost:cost,retried:false,retryCost:0,retrySkippedReasoning:false,retryTimedOut:false};
       }
       return afterFirst().then(function(out){
         findings=out.findings; res=out.res; cost=out.cost;
         var usage=res.json.usage||{};
-        if(findings==null){ errorFiles++; fileResults.push({file:f.name,error:"unparsed",unparsed:true,retried:out.retried,reasoning_tokens:reasoningTokensOf(usage),usage:usage,cost_usd:Math.round(cost*1000000)/1000000}); }
+        if(findings==null){ errorFiles++; fileResults.push({file:f.name,error:"unparsed",unparsed:true,retried:out.retried,retrySkippedReasoning:!!out.retrySkippedReasoning,retryTimedOut:!!out.retryTimedOut,reasoning_tokens:reasoningTokensOf(usage),usage:usage,cost_usd:Math.round(cost*1000000)/1000000}); }
         else { totalFindings+=findings.length; if(!findings.length) noFindingFiles++; fileResults.push({file:f.name,findings:findings,retried:out.retried,usage:usage,cost_usd:Math.round(cost*1000000)/1000000}); }
-        renderRepoFile(f,findings,res,cost,out.retried);
+        renderRepoFile(f,findings,res,cost,out.retried,out.retrySkippedReasoning,out.retryTimedOut);
       });
     }).catch(function(e){
       errorFiles++;
-      fileResults.push({file:f.name,error:e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90):networkErrorText()),cost_usd:0});
-      renderRepoFile(f,null,null,0,e&&e.status?apiErrorText(e.status):(e&&e.timeout?timeoutErrorText(90):networkErrorText()));
+      var timedOut=!!(e&&e.timeout);
+      var errMsg=e&&e.status?apiErrorText(e.status):(timedOut?timeoutErrorText(90):networkErrorText());
+      fileResults.push({file:f.name,error:timedOut?"timeout":(e&&e.status?("HTTP "+e.status):"error"),unparsed:timedOut,timeout:timedOut,errorText:errMsg,cost_usd:0});
+      renderRepoFile(f,null,null,0,errMsg,false,timedOut);
     }).then(function(){
       done++; bar.style.width=(done/files.length*100)+"%";
       status.textContent="Done "+done+" of "+files.length+" files. Findings so far: "+totalFindings+". Spend so far "+money(totalCost)+".";
@@ -1310,7 +1339,7 @@ document.getElementById("repo-run").addEventListener("click",function(){
     });
   }
   function finish(){
-    btn.disabled=!getKey(); stopBtn.style.display="none"; prog.style.display="none";
+    updateRunButtons(); stopBtn.style.display="none"; prog.style.display="none";
     var unparsedCount=fileResults.filter(function(fr){ return fr.unparsed; }).length;
     status.textContent=(repoStop?"Stopped early after ":"Finished ")+done+" of "+files.length+" files on "+model+". Findings returned: "+totalFindings+". Files with no findings: "+noFindingFiles+". Files with no verdict (unparsed or error): "+errorFiles+", of which unparsed: "+unparsedCount+". Unparsed does not mean clean. Total cost "+money(totalCost)+"."+(skipped.length?" Skipped "+skipped.length+" file(s): over 40 KB or not yet fetched.":"");
     var run={kind:"repo",mode:"repo",model:model,checks:checks,files:fileResults,total_findings:totalFindings,files_audited:done,files_no_verdict:errorFiles,files_unparsed:fileResults.filter(function(fr){ return fr.unparsed; }).length,max_tokens:REPO_MAX_TOKENS,total_cost_usd:Math.round(totalCost*1000000)/1000000,stopped_early:repoStop,at:new Date().toISOString()};
@@ -1321,13 +1350,14 @@ document.getElementById("repo-run").addEventListener("click",function(){
   step(0);
   }
 });
-function renderRepoFile(f,findings,res,cost,errTextOrRetried){
+function renderRepoFile(f,findings,res,cost,errTextOrRetried,retrySkippedReasoning,retryTimedOut){
   var retried=(errTextOrRetried===true); var errText=(typeof errTextOrRetried==="string")?errTextOrRetried:null;
+  var retrySkipped=!!retrySkippedReasoning; var timedOut=!!retryTimedOut || (errText&&errText.indexOf("timed out")!==-1);
   var host=document.getElementById("repo-results");
   var card=document.createElement("div"); card.className="wcard"; card.style.marginBottom="18px";
   var html="<h3 style='overflow-wrap:anywhere'>"+esc(f.name)+"</h3>";
-  if(errText){ html+="<p class='w-note'>No findings for this file: "+esc(errText)+" Nothing was invented.</p>"; }
-  else if(findings==null){ var u=res?res.json.usage||{}:{}; var rt=reasoningTokensOf(u); html+="<p class='w-note'><b>Unparsed, no verdict, this file is NOT clean.</b> The model replied, but not in the JSON format requested, so no findings are shown for this file rather than guessing. "+(retried?"It was retried once with a shorter prompt and still returned no JSON. ":"")+(rt?("It spent "+rt+" of "+(u.completion_tokens||0)+" completion tokens reasoning and produced no visible answer, which is what happens when max_tokens is too small for a reasoning model. "):"")+"Try the same file again with google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash or XiaomiMiMo/MiMo-V2.6-Flash, which parsed reliably in the 50-finding test. Tokens: "+esc(JSON.stringify(u))+"</p>"; }
+  if(errText){ html+="<p class='w-note'><b>"+(timedOut?"Timed out after 90 seconds, no verdict, this file is NOT clean.":"No verdict for this file.")+"</b> "+esc(errText)+" Nothing was invented.</p>"; }
+  else if(findings==null){ var u=res?res.json.usage||{}:{}; var rt=reasoningTokensOf(u); html+="<p class='w-note'><b>Unparsed, no verdict, this file is NOT clean.</b> The model replied, but not in the JSON format requested, so no findings are shown for this file rather than guessing. "+(retried?"It was retried once with a shorter prompt and still returned no JSON. ":"")+(retrySkipped?"No retry was made: this is a reasoning-heavy model, and in testing deepseek-ai/deepseek-v4.1-flash-1017 spent all 2500 tokens reasoning on a retry too, $0.004247 extra, and still returned no JSON. ":"")+(timedOut?"The retry timed out after 90 seconds with no answer, so it is shown as unparsed, not as a crash. ":"")+(rt?("It spent "+rt+" of "+(u.completion_tokens||0)+" completion tokens reasoning and produced no visible answer, which is what happens when max_tokens is too small for a reasoning model. "):"")+"Try the same file again with a model you choose yourself: google/gemini-3.5-flash-lite, Qwen/Qwen3.8-Flash or XiaomiMiMo/MiMo-V2.6-Flash parsed reliably in the 50-finding test. Tokens: "+esc(JSON.stringify(u))+"</p>"; }
   else if(!findings.length){ html+="<p class='w-note'>No findings returned for this file. That means the model found nothing matching the selected checks in the code shown, not that the file is proven safe.</p>"; }
   else{
     findings.forEach(function(fd){
@@ -1381,7 +1411,7 @@ function buildMarkdown(run){
     (run.files||[]).forEach(function(fr){
       lines.push("### "+fr.file);
       lines.push("");
-      if(fr.error){ lines.push(fr.unparsed?"Unparsed, no verdict, this file is NOT clean. Retry with a different model, or max_tokens 2500. Reasoning tokens used: "+(fr.reasoning_tokens||0)+".":"No findings: "+fr.error); lines.push(""); return; }
+      if(fr.error){ lines.push(fr.unparsed?(fr.timeout?"Timed out after 90 seconds, no verdict, this file is NOT clean.":"Unparsed, no verdict, this file is NOT clean.")+" Retry with a different model, or max_tokens 2500. Reasoning tokens used: "+(fr.reasoning_tokens||0)+(fr.retrySkippedReasoning?". No retry was made for this reasoning-heavy model.":"."):"No findings: "+fr.error); lines.push(""); return; }
       if(!fr.findings||!fr.findings.length){ lines.push("No findings returned."); lines.push(""); return; }
       fr.findings.forEach(function(fd){
         lines.push("- Line "+(fd.line==null?"n/a":fd.line)+", "+fd.check+": **"+fd.verdict+"**, severity "+fd.severity+", confidence "+fd.confidence);
@@ -1490,6 +1520,7 @@ document.getElementById("runs-clear").addEventListener("click",function(){ saveR
 
 /* ---------- Init ---------- */
 refreshKeyUI();
+updateRunButtons();
 updateInputMeta();
 updateRepoEstimate();
 renderReport();
