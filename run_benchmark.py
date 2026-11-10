@@ -140,21 +140,51 @@ def chat(model, prompt, max_tokens=MAX_TOKENS):
         usage["retried"] = (attempt == 2)
     return content, dt, usage
 
+def _extract_balanced_json(text):
+    """Return the first balanced {...} object in text, or None."""
+    start = text.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    in_str = False
+    esc = False
+    for i in range(start, len(text)):
+        ch = text[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+        else:
+            if ch == '"':
+                in_str = True
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    return text[start:i + 1]
+    return None
+
 def parse_verdict(text):
     if not text:
         return None
-    m = re.search(r"\{[^}]*\}", text, re.S)
-    if not m:
+    raw = _extract_balanced_json(text)
+    if not raw:
         return None
     try:
-        d = json.loads(m.group(0))
+        d = json.loads(raw)
     except Exception:
         return None
-    v = str(d.get("verdict", "")).lower()
-    if "false" in v:
-        return "false_positive"
-    if "real" in v:
+    if not isinstance(d, dict):
+        return None
+    v = str(d.get("verdict", "")).strip()
+    if v == "real":
         return "real"
+    if v == "false_positive":
+        return "false_positive"
     return None
 
 PROMPT = """You are a security code reviewer. Classify this code finding.
@@ -175,6 +205,7 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=MAX_TOKENS)
     ap.add_argument("--out", default="results.json")
     ap.add_argument("--merge", action="store_true", help="Merge new per-model results into the existing output file instead of replacing it")
+    ap.add_argument("--allow-unpriced", action="store_true", help="Allow models with no flat per-token pricing (e.g. gmicloud/Ripple-65B-Preview). Without this flag such models are refused, because their cost cannot be estimated against the $5 hard cap.")
     args = ap.parse_args()
 
     # 1. Validate every requested model ID live, do not guess IDs.
@@ -205,10 +236,13 @@ def main():
     if total_est > HARD_CAP_USD:
         print(f"ERROR: estimated total ${total_est:.6f} exceeds the hard ${HARD_CAP_USD:.2f} cap. Refusing to run. Use --limit to run fewer findings or pick cheaper models.", file=sys.stderr)
         raise SystemExit(3)
-    if unknown_pricing:
-        print(f"WARNING: no flat pricing for {unknown_pricing}; cost cannot be estimated for those models.", file=sys.stderr)
     if args.estimate_only:
+        if unknown_pricing:
+            print(f"WARNING: no flat pricing for {unknown_pricing}; cost cannot be estimated for those models.", file=sys.stderr)
         return
+    if unknown_pricing and not args.allow_unpriced:
+        print(f"ERROR: no flat pricing for {unknown_pricing}; cost cannot be estimated against the ${HARD_CAP_USD:.2f} hard cap. Refusing to run. Re-run with --allow-unpriced to run them anyway, or run a 5-finding probe first.", file=sys.stderr)
+        raise SystemExit(3)
 
     if args.merge and (BASE / args.out).exists():
         results = json.load(open(BASE / args.out))
