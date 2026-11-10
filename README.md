@@ -203,7 +203,7 @@ A push to `Master` updates both. Vercel does not always auto-deploy on push; if 
 
 Built on the [GMI Cloud Inference Engine](https://www.gmicloud.ai/) — list models and chat completions at `https://api.gmi-serving.com/v1`. Inference only: no AgentBox, no GMI Studio, no Cluster Engine is used by this tool.
 
-If you share it, tag [@gmi_cloud](https://x.com/gmi_cloud) and use `#GMICloud` and `#GMIStudio`. The GMI Clouder monthly submission deadline is the last day of the month, end of day PT — November 30, 2026 for the current cycle, payout December 15, 2026.
+If you share it, tag [@gmi_cloud](https://x.com/gmi_cloud) and use `#GMICloud` and `#GMIStudio`.
 
 ## Screenshots
 
